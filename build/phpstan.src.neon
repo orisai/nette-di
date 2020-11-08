@@ -1,0 +1,11 @@
+includes:
+	- phpstan.base.neon
+
+parameters:
+	level: max
+
+	ignoreErrors:
+		# ReflectionClass->getFileName() returns false only for internal classes
+		- message: '#^Parameter \#1 \$filename of function filemtime expects string, string\|false given\.$#'
+		  path: ../src/Boot/BaseConfigurator.php
+		  count: 1

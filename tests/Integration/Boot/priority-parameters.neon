@@ -1,0 +1,4 @@
+parameters:
+	p1: file
+	p2: file
+	p3: file

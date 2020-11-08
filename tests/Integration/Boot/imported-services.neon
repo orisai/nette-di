@@ -1,0 +1,7 @@
+services:
+	service1:
+		type: Tests\OriNette\DI\Doubles\TestService
+		imported: true
+	service2:
+		type: Tests\OriNette\DI\Doubles\TestService
+		imported: true
