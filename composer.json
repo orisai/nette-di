@@ -1,0 +1,54 @@
+{
+	"name": "orisai/nette-di",
+	"description": "Configure your Orisai CMF/Nette application",
+	"keywords": [
+		"bootstrap",
+		"configuration",
+		"dependency-injection",
+		"nette",
+		"orisai"
+	],
+	"type": "library",
+	"license": "MPL-2.0",
+	"homepage": "https://github.com/orisai/nette-di",
+	"authors": [
+		{
+			"name": "Marek Bartoš",
+			"homepage": "https://github.com/mabar"
+		}
+	],
+	"require": {
+		"php": ">=7.4.0 <8.2.0",
+		"nette/di": "^3.0.5",
+		"orisai/exceptions": "^1.0.0"
+	},
+	"require-dev": {
+		"infection/infection": "^0.20.0",
+		"orisai/coding-standard": "^1.0.0",
+		"pepakriz/phpstan-exception-rules": "^0.10.0",
+		"phpstan/extension-installer": "^1.0.0",
+		"phpstan/phpstan": "^0.12.0",
+		"phpstan/phpstan-deprecation-rules": "^0.12.0",
+		"phpstan/phpstan-nette": "^0.12.0",
+		"phpstan/phpstan-phpunit": "^0.12.0",
+		"phpstan/phpstan-strict-rules": "^0.12.0",
+		"phpunit/phpunit": "^9.3.0",
+		"staabm/annotate-pull-request-from-checkstyle": "^1.1.0",
+		"tracy/tracy": "^2.7.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"OriNette\\DI\\": "src"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Tests\\OriNette\\DI\\": "tests"
+		}
+	},
+	"minimum-stability": "dev",
+	"prefer-stable": true,
+	"config": {
+		"sort-packages": true
+	}
+}

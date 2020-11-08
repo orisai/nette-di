@@ -1,0 +1,3 @@
+services:
+	- Tests\OriNette\DI\Doubles\TestService
+	- stdClass

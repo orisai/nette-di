@@ -1,0 +1,2 @@
+services:
+	test: Tests\OriNette\DI\Doubles\TestService()
