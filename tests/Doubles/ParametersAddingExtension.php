@@ -4,7 +4,7 @@ namespace Tests\OriNette\DI\Doubles;
 
 use Nette\DI\CompilerExtension;
 
-final class TestExtension extends CompilerExtension
+final class ParametersAddingExtension extends CompilerExtension
 {
 
 	/** @var array<mixed> */
