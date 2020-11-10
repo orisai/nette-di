@@ -1,0 +1,18 @@
+services:
+	referenced:
+		factory: Tests\OriNette\DI\Doubles\TestService
+		setup:
+			- addParams('%%message%%')
+
+loader:
+	definitions:
+		string: Tests\OriNette\DI\Doubles\TestService
+		statement: Tests\OriNette\DI\Doubles\TestService()
+		reference: @referenced
+		array:
+			factory: Tests\OriNette\DI\Doubles\TestService
+			setup:
+				- addParams('%%message%%')
+		arrayWithAutowiringSet:
+			factory: Tests\OriNette\DI\Doubles\TestService
+			autowired: true

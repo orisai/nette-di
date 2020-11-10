@@ -8,7 +8,7 @@ use Nette\DI\MissingServiceException;
 use OriNette\DI\Boot\ManualConfigurator;
 use PHPUnit\Framework\TestCase;
 use stdClass;
-use Tests\OriNette\DI\Doubles\TestExtension;
+use Tests\OriNette\DI\Doubles\ParametersAddingExtension;
 use Tests\OriNette\DI\Doubles\TestService;
 use Tracy\Debugger;
 use function class_exists;
@@ -177,7 +177,7 @@ final class BaseConfiguratorTest extends TestCase
 		$configurator->addStaticParameters(['__unique' => __METHOD__]);
 		$configurator->addConfig(__DIR__ . '/extensions.neon');
 		$configurator->onCompile[] = static function (Compiler $compiler): void {
-			$compiler->addExtension('test3', new TestExtension(['test3' => 'test3']));
+			$compiler->addExtension('test3', new ParametersAddingExtension(['test3' => 'test3']));
 		};
 
 		$container = $configurator->createContainer();
