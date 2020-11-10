@@ -17,6 +17,7 @@ Configure your Orisai CMF/Nette application
 	- [Import services](#import-services)
 	- [Compilation](#compilation)
 	- [Cache warmup](#cache-warmup)
+- [Definitions loader](#definitions-loader)
 
 ## Configurator
 
@@ -312,4 +313,81 @@ $configurator->addStaticParameters([
 $configurator->loadContainer();
 
 // etc.
+```
+
+## Definitions loader
+
+Extensions can accept services in any format which is allowed by `services` section in the configuration and also
+accept references via `@serviceName` to services from `services`. To achieve this follow example below:
+
+These are all valid ways how to write a service:
+
+```neon
+extensions:
+    example: ExampleExtension
+
+services:
+	referenced: ExampleService
+
+example:
+	services:
+		string: ExampleService
+		statement: ExampleService()
+		reference: @referenced
+		array:
+			factory: ExampleService
+```
+
+Services loaded via `DefinitionsLoader` are *not autowired* by default because they are extension-specific.
+Autowiring of services referenced via `@serviceName` or with `autowired` explicitly set is not changed.
+
+```neon
+example:
+	services:
+		arrayWithAutowiringSet:
+			factory: ExampleService
+			autowired: true
+```
+
+Integration of `DefinitionsLoader` which would load these definitions may look like this:
+
+```php
+use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\Statement;
+use Nette\Schema\Expect;
+use Nette\Schema\Schema;
+use OriNette\DI\Definitions\DefinitionsLoader;
+
+final class ExampleExtension extends CompilerExtension
+{
+
+	public function getConfigSchema(): Schema
+	{
+		return Expect::structure([
+			'services' => Expect::arrayOf(
+				Expect::anyOf(Expect::string(), Expect::array(), Expect::type(Statement::class)),
+			),
+		]);
+	}
+
+	public function loadConfiguration(): void
+	{
+		parent::loadConfiguration();
+
+		$loader = new DefinitionsLoader($this->compiler);
+
+		$config = $this->config;
+		foreach ($config->services as $serviceName => $serviceConfig) {
+			$serviceDefinition = $loader->loadDefinitionFromConfig(
+				$serviceConfig,
+                // service name which is used if not @referenced
+				$this->prefix('definition.' . $serviceName)
+			);
+
+			// Do anything you want with the service
+            //  - returns string if @referenced service was not loaded yet or instance of Definition otherwise
+		}
+	}
+
+}
 ```
