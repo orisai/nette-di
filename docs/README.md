@@ -227,10 +227,10 @@ Env variables are transformed into array via pattern `PREFIX{delimiter}{NAME-1}{
 In following example is how env variable look and the resulting parameters after transformation
 
 ```dotenv
-ORISAI__PARAMETER' = parameter
-ORISAI__SINGLE_UNDERSCORE' = single_underscore
-ORISAI__UPPER__lower__MiXeD' = upper.lower.mixed
-ORISAI__UPPER__another__parameter = 'upper.another.parameter
+ORISAI__PARAMETER = parameter
+ORISAI__SINGLE_UNDERSCORE = single_underscore
+ORISAI__UPPER__lower__MiXeD = upper.lower.mixed
+ORISAI__UPPER__another__parameter = upper.another.parameter
 ```
 
 ```neon
