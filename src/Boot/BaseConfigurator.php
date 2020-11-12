@@ -81,6 +81,7 @@ abstract class BaseConfigurator
 			'logDir' => $this->rootDir . '/var/log',
 			'tempDir' => $this->rootDir . '/var/tmp',
 			'vendorDir' => $this->rootDir . '/vendor',
+			'wwwDir' => $this->rootDir . '/public',
 			'debugMode' => false,
 			'consoleMode' => PHP_SAPI === 'cli',
 		];
