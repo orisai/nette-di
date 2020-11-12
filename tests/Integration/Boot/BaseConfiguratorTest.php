@@ -75,6 +75,7 @@ final class BaseConfiguratorTest extends TestCase
 		self::assertSame($rootDir . '/var/log', $parameters['logDir']);
 		self::assertSame($rootDir . '/var/tmp', $parameters['tempDir']);
 		self::assertSame($rootDir . '/vendor', $parameters['vendorDir']);
+		self::assertSame($rootDir . '/public', $parameters['wwwDir']);
 		self::assertTrue($parameters['debugMode']);
 		self::assertTrue($parameters['consoleMode']);
 		self::assertSame('test', $parameters['test']);
