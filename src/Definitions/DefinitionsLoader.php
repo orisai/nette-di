@@ -4,14 +4,21 @@ namespace OriNette\DI\Definitions;
 
 use Nette\DI\Compiler;
 use Nette\DI\Definitions\Definition;
+use Nette\DI\Definitions\FactoryDefinition;
+use Nette\DI\Definitions\LocatorDefinition;
+use Nette\DI\Definitions\ServiceDefinition;
 use Nette\DI\Definitions\Statement;
+use Nette\DI\Resolver;
 use Nette\Utils\Strings;
 use function array_key_exists;
+use function array_merge;
+use function array_unique;
 use function is_array;
 use function is_string;
 use function preg_replace;
 use function str_replace;
 use function substr;
+use const SORT_REGULAR;
 
 final class DefinitionsLoader
 {
@@ -83,6 +90,62 @@ final class DefinitionsLoader
 		}
 
 		return $value;
+	}
+
+	/**
+	 * @param array<Definition> $definitions
+	 * @return array<ServiceDefinition>
+	 */
+	public function getServiceDefinitionsFromDefinitions(array $definitions): array
+	{
+		$definitionsByDefinition = [];
+		foreach ($definitions as $definition) {
+			$definitionsByDefinition[] = $this->getServiceDefinitionsFromDefinition($definition);
+		}
+
+		$serviceDefinitions = array_merge(...$definitionsByDefinition);
+
+		// Filter out duplicates - we cannot distinguish if service from LocatorDefinition is created
+		// by accessor or factory so duplicates are possible
+		$serviceDefinitions = array_unique($serviceDefinitions, SORT_REGULAR);
+
+		return $serviceDefinitions;
+	}
+
+	/**
+	 * @return array<ServiceDefinition>
+	 */
+	private function getServiceDefinitionsFromDefinition(Definition $definition): array
+	{
+		if ($definition instanceof ServiceDefinition) {
+			return [$definition];
+		}
+
+		if ($definition instanceof FactoryDefinition) {
+			return [$definition->getResultDefinition()];
+		}
+
+		if ($definition instanceof LocatorDefinition) {
+			$resolver = new Resolver($this->compiler->getContainerBuilder());
+
+			$definitionsByReference = [];
+			foreach ($definition->getReferences() as $reference) {
+				// Check that reference is valid
+				$reference = $resolver->normalizeReference($reference);
+				// Get definition from reference
+				$definition = $resolver->resolveReference($reference);
+				// Only ServiceDefinition should be possible here
+
+				$definitionsByReference[] = $this->getServiceDefinitionsFromDefinition($definition);
+			}
+
+			return array_merge(...$definitionsByReference);
+		}
+
+		// Accessor - service definition exists independently
+		// Imported - runtime-created service, cannot work with
+		// Unknown
+		return [];
 	}
 
 }
