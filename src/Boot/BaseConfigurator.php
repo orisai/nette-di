@@ -169,9 +169,9 @@ abstract class BaseConfigurator
 
 		$parameters = DIHelpers::escape($this->staticParameters) +
 			[
-				'compilation' => [
-					'timestamp' => (int) $now->format('U'),
-					'time' => $now->format(DATE_ATOM),
+				'container' => [
+					'compiledAtTimestamp' => (int) $now->format('U'),
+					'compiledAt' => $now->format(DATE_ATOM),
 				],
 			];
 		$compiler->addConfig(['parameters' => $parameters]);
@@ -234,6 +234,8 @@ abstract class BaseConfigurator
 	{
 		$containerClass = $this->loadContainer();
 		$container = new $containerClass($this->dynamicParameters);
+
+		$container->parameters['container']['className'] = $containerClass;
 
 		foreach ($this->services as $name => $service) {
 			$container->addService($name, $service);

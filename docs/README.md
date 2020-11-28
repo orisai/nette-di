@@ -208,8 +208,8 @@ Configurator define some parameters you may need:
     - whether application is in debug mode
 - `%consoleMode%`
     - whether application is in console mode
-- `%compilation%`
-    - info about container compilation, like when the container was compiled
+- `%container%`
+    - info about container - when it was compiled, name of the container
 
 #### Load parameters from env variables
 
