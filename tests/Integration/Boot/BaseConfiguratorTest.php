@@ -80,9 +80,10 @@ final class BaseConfiguratorTest extends TestCase
 		self::assertTrue($parameters['consoleMode']);
 		self::assertSame('test', $parameters['test']);
 		self::assertSame('dynamic', $parameters['dynamic']);
-		self::assertArrayHasKey('compilation', $parameters);
-		self::assertArrayHasKey('time', $parameters['compilation']);
-		self::assertArrayHasKey('timestamp', $parameters['compilation']);
+		self::assertArrayHasKey('container', $parameters);
+		self::assertArrayHasKey('compiledAtTimestamp', $parameters['container']);
+		self::assertArrayHasKey('compiledAt', $parameters['container']);
+		self::assertArrayHasKey('className', $parameters['container']);
 	}
 
 	public function testParametersSpecificContainer(): void
