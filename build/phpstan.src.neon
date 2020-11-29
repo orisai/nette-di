@@ -3,6 +3,7 @@ includes:
 
 parameters:
 	level: max
+	resultCachePath: %currentWorkingDirectory%/var/build-tools/PHPStan/resultCache.src.php
 
 	ignoreErrors:
 		# ReflectionClass->getFileName() returns false only for internal classes
