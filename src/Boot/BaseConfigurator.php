@@ -48,10 +48,7 @@ abstract class BaseConfigurator
 	 */
 	public array $onCompile = [];
 
-	/**
-	 * @var array<string>
-	 * @phpstan-var array<class-string>
-	 */
+	/** @var array<class-string> */
 	public array $autowireExcludedClasses = [ArrayAccess::class, Countable::class, IteratorAggregate::class, stdClass::class, Traversable::class];
 
 	/** @var array<string, mixed> */
@@ -198,7 +195,7 @@ abstract class BaseConfigurator
 	abstract protected function loadConfigFiles(): array;
 
 	/**
-	 * @phpstan-return class-string<Container>
+	 * @return class-string<Container>
 	 */
 	public function loadContainer(): string
 	{
