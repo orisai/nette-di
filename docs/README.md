@@ -378,14 +378,14 @@ final class ExampleExtension extends CompilerExtension
 
 		$config = $this->config;
 		foreach ($config->services as $serviceName => $serviceConfig) {
-			$serviceDefinition = $loader->loadDefinitionFromConfig(
+			$definition = $loader->loadDefinitionFromConfig(
 				$serviceConfig,
                 // service name which is used if not @referenced
 				$this->prefix('definition.' . $serviceName)
 			);
 
-			// Do anything you want with the service
-            //  - returns string if @referenced service was not loaded yet or instance of Definition otherwise
+			// Do anything you want with the definition
+            //  - returns Reference if @referenced service was not loaded yet or instance of Definition otherwise
 		}
 	}
 

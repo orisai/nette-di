@@ -4,6 +4,7 @@ namespace OriNette\DI\Definitions;
 
 use Nette\DI\Compiler;
 use Nette\DI\Definitions\Definition;
+use Nette\DI\Definitions\Reference;
 use Nette\DI\Definitions\Statement;
 use Nette\Utils\Strings;
 use function array_key_exists;
@@ -25,23 +26,23 @@ final class DefinitionsLoader
 
 	/**
 	 * @param string|array<mixed>|Statement $config
-	 * @return Definition|string
+	 * @return Definition|Reference
 	 */
 	public function loadDefinitionFromConfig($config, string $preferredPrefix)
 	{
 		$builder = $this->compiler->getContainerBuilder();
 
-		// Definition is defined in ServicesExtension, try to get it
+		// Definition is defined by external source (e.g. ServicesExtension), try to get it
 		if (is_string($config) && Strings::startsWith($config, '@')) {
 			$definitionName = substr($config, 1);
 
-			// Definition is already loaded (beforeCompile phase), return it
+			// Definition is already loaded, return it
 			if ($builder->hasDefinition($definitionName)) {
 				return $builder->getDefinition($definitionName);
 			}
 
-			// Definition not loaded yet (loadConfiguration phase), return reference string
-			return $config;
+			// Definition not loaded yet, return Reference
+			return new Reference($definitionName);
 		}
 
 		// Raw configuration given, create definition from it
