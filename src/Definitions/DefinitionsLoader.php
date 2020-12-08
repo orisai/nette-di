@@ -7,6 +7,7 @@ use Nette\DI\Definitions\Definition;
 use Nette\DI\Definitions\Reference;
 use Nette\DI\Definitions\Statement;
 use Nette\Utils\Strings;
+use Orisai\Exceptions\Logic\InvalidArgument;
 use function array_key_exists;
 use function is_array;
 use function is_string;
@@ -39,6 +40,11 @@ final class DefinitionsLoader
 			// Definition is already loaded, return it
 			if ($builder->hasDefinition($definitionName)) {
 				return $builder->getDefinition($definitionName);
+			}
+
+			if ($definitionName === Reference::SELF) {
+				throw InvalidArgument::create()
+					->withMessage("Referencing @self in unsupported context of {$preferredPrefix}.");
 			}
 
 			// Definition not loaded yet, return Reference

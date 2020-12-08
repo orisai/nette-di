@@ -5,6 +5,7 @@ namespace Tests\OriNette\DI\Integration\Definitions;
 use Generator;
 use Nette\DI\Compiler;
 use OriNette\DI\Boot\ManualConfigurator;
+use Orisai\Exceptions\Logic\InvalidArgument;
 use PHPUnit\Framework\TestCase;
 use Tests\OriNette\DI\Doubles\DefinitionsList;
 use Tests\OriNette\DI\Doubles\DefinitionsLoadingExtension;
@@ -16,9 +17,9 @@ final class DefinitionsLoaderTest extends TestCase
 {
 
 	/**
-	 * @dataProvider provider
+	 * @dataProvider resolvingProvider
 	 */
-	public function test(bool $loadLater): void
+	public function testResolving(bool $loadLater): void
 	{
 		$configurator = new ManualConfigurator(dirname(__DIR__, 3));
 		$configurator->setDebugMode(true);
@@ -135,10 +136,29 @@ final class DefinitionsLoaderTest extends TestCase
 	/**
 	 * @return Generator<array<bool>>
 	 */
-	public function provider(): Generator
+	public function resolvingProvider(): Generator
 	{
 		yield 'loadInLoadConfiguration' => [false];
 		yield 'loadInBeforeCompile' => [true];
+	}
+
+	public function testSelfReference(): void
+	{
+		$configurator = new ManualConfigurator(dirname(__DIR__, 3));
+		$configurator->setDebugMode(true);
+		$configurator->addStaticParameters([
+			'__unique' => __METHOD__,
+		]);
+		$configurator->addConfig(__DIR__ . '/definitions.self.neon');
+
+		$configurator->onCompile[] = static function (Compiler $compiler): void {
+			$compiler->addExtension('loader', new DefinitionsLoadingExtension(false));
+		};
+
+		$this->expectException(InvalidArgument::class);
+		$this->expectExceptionMessage('Referencing @self in unsupported context of loader.definition.error.');
+
+		$configurator->createContainer();
 	}
 
 }
