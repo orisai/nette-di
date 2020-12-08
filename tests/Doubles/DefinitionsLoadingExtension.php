@@ -3,10 +3,14 @@
 namespace Tests\OriNette\DI\Doubles;
 
 use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\Definition;
+use Nette\DI\Definitions\Reference;
+use Nette\DI\Definitions\ServiceDefinition;
 use Nette\DI\Definitions\Statement;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use OriNette\DI\Definitions\DefinitionsLoader;
+use Orisai\Exceptions\Logic\ShouldNotHappen;
 use stdClass;
 
 /**
@@ -52,11 +56,50 @@ final class DefinitionsLoadingExtension extends CompilerExtension
 	private function loadIt(): void
 	{
 		$loader = new DefinitionsLoader($this->compiler);
-
 		$config = $this->config;
+
+		$list = [];
 		foreach ($config->definitions as $name => $definition) {
-			$loader->loadDefinitionFromConfig($definition, $this->prefix('definition.' . $name));
+			$serviceKey = $this->prefix('definition.' . $name);
+			$resolved = $loader->loadDefinitionFromConfig($definition, $serviceKey);
+			$list[$serviceKey] = $this->getData($resolved);
 		}
+
+		$listDef = new ServiceDefinition();
+		$listDef->setFactory(DefinitionsList::class, [
+			'list' => $list,
+		]);
+		$this->getContainerBuilder()->addDefinition($this->prefix('list'), $listDef);
+	}
+
+	/**
+	 * @param mixed $def
+	 * @return array<mixed>
+	 */
+	private function getData($def): array
+	{
+		if ($def instanceof Reference) {
+			return [
+				'type' => 'reference',
+				'value' => $def->getValue(),
+				'isName' => $def->isName(),
+				'isType' => $def->isType(),
+				'isSelf' => $def->isSelf(),
+				'service' => $def,
+			];
+		}
+
+		if ($def instanceof Definition) {
+			return [
+				'type' => 'definition',
+				'name' => $def->getName(),
+				'serviceType' => $def->getType(),
+				'autowired' => $def->isExported(),
+				'service' => $def,
+			];
+		}
+
+		throw ShouldNotHappen::create();
 	}
 
 }

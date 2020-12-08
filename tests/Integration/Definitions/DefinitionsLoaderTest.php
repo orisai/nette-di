@@ -6,6 +6,7 @@ use Generator;
 use Nette\DI\Compiler;
 use OriNette\DI\Boot\ManualConfigurator;
 use PHPUnit\Framework\TestCase;
+use Tests\OriNette\DI\Doubles\DefinitionsList;
 use Tests\OriNette\DI\Doubles\DefinitionsLoadingExtension;
 use Tests\OriNette\DI\Doubles\TestService;
 use function assert;
@@ -15,7 +16,7 @@ final class DefinitionsLoaderTest extends TestCase
 {
 
 	/**
-	 * @dataProvider provideTestData
+	 * @dataProvider provider
 	 */
 	public function test(bool $loadLater): void
 	{
@@ -33,19 +34,37 @@ final class DefinitionsLoaderTest extends TestCase
 
 		$container = $configurator->createContainer();
 
-		self::assertInstanceOf(TestService::class, $container->getService('referenced'));
-		self::assertInstanceOf(TestService::class, $container->getService('loader.definition.string'));
-		self::assertInstanceOf(TestService::class, $container->getService('loader.definition.statement'));
-		self::assertInstanceOf(TestService::class, $container->getService('loader.definition.array'));
-		self::assertInstanceOf(TestService::class, $container->getService('loader.definition.arrayWithAutowiringSet'));
-		self::assertFalse($container->hasService('loader.definition.reference'));
+		// /////
+		// All declared services exist
+		// /////
+		$referencedService = $container->getService('referenced');
+		self::assertInstanceOf(TestService::class, $referencedService);
+
+		$stringService = $container->getService('loader.definition.string');
+		self::assertInstanceOf(TestService::class, $stringService);
+
+		$statementService = $container->getService('loader.definition.statement');
+		self::assertInstanceOf(TestService::class, $statementService);
+
+		$arrayService = $container->getService('loader.definition.array');
+		self::assertInstanceOf(TestService::class, $arrayService);
+
+		$arrayWithAutowiringService = $container->getService('loader.definition.arrayWithAutowiringSet');
+		self::assertInstanceOf(TestService::class, $arrayWithAutowiringService);
+
 		self::assertCount(5, $container->findByType(TestService::class));
-		// 'referenced' from services and 'arrayWithAutowiringSet' from extension
+		// Only 'referenced' from services and 'arrayWithAutowiringSet' from extension are autowired
 		self::assertCount(2, $container->findAutowired(TestService::class));
 
-		$referencedService = $container->getService('referenced');
+		// /////
+		// Reference has own name
+		// /////
+		self::assertFalse($container->hasService('loader.definition.reference'));
+
+		// /////
+		// Double escaped message is not handled as a parameter
+		// /////
 		assert($referencedService instanceof TestService);
-		$arrayService = $container->getService('loader.definition.array');
 		assert($arrayService instanceof TestService);
 
 		self::assertSame([
@@ -55,12 +74,68 @@ final class DefinitionsLoaderTest extends TestCase
 		self::assertSame([
 			['%message%'],
 		], $arrayService->getParams());
+
+		// /////
+		// References and definitions are properly resolved and have correct values in compile time
+		// /////
+		$referencedDefinition = $loadLater
+			? [
+				'type' => 'definition',
+				'name' => 'referenced',
+				'serviceType' => TestService::class,
+				'autowired' => false,
+				'service' => $referencedService,
+			]
+			: [
+				'type' => 'reference',
+				'value' => 'referenced',
+				'isName' => true,
+				'isType' => false,
+				'isSelf' => false,
+				'service' => $referencedService,
+			];
+
+		$list = $container->getByType(DefinitionsList::class);
+		self::assertSame(
+			[
+				'loader.definition.string' => [
+					'type' => 'definition',
+					'name' => 'loader.definition.string',
+					'serviceType' => null,
+					'autowired' => false,
+					'service' => $stringService,
+				],
+				'loader.definition.statement' => [
+					'type' => 'definition',
+					'name' => 'loader.definition.statement',
+					'serviceType' => null,
+					'autowired' => false,
+					'service' => $statementService,
+				],
+				'loader.definition.reference' => $referencedDefinition,
+				'loader.definition.array' => [
+					'type' => 'definition',
+					'name' => 'loader.definition.array',
+					'serviceType' => null,
+					'autowired' => false,
+					'service' => $arrayService,
+				],
+				'loader.definition.arrayWithAutowiringSet' => [
+					'type' => 'definition',
+					'name' => 'loader.definition.arrayWithAutowiringSet',
+					'serviceType' => null,
+					'autowired' => false,
+					'service' => $arrayWithAutowiringService,
+				],
+			],
+			$list->getList(),
+		);
 	}
 
 	/**
 	 * @return Generator<array<bool>>
 	 */
-	public function provideTestData(): Generator
+	public function provider(): Generator
 	{
 		yield 'loadInLoadConfiguration' => [false];
 		yield 'loadInBeforeCompile' => [true];
