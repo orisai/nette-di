@@ -14,8 +14,8 @@ use Nette\DI\ContainerLoader;
 use Nette\DI\Extensions\ExtensionsExtension;
 use Nette\DI\Helpers as DIHelpers;
 use Nette\Schema\Helpers as ConfigHelpers;
-use Orisai\Exceptions\Logic\InvalidState;
-use Orisai\Exceptions\Message;
+use Orisai\Utils\Dependencies\Dependencies;
+use Orisai\Utils\Dependencies\Exception\PackageRequired;
 use ReflectionClass;
 use stdClass;
 use Tracy\Bridges\Nette\Bridge;
@@ -28,7 +28,6 @@ use function filemtime;
 use function is_subclass_of;
 use function method_exists;
 use function mkdir;
-use function sprintf;
 use const DATE_ATOM;
 use const PHP_RELEASE_VERSION;
 use const PHP_SAPI;
@@ -101,14 +100,8 @@ abstract class BaseConfigurator
 
 	public function enableDebugger(): void
 	{
-		if (!class_exists(Debugger::class)) {
-			$message = Message::create()
-				->withContext(sprintf('Trying to call `%s->%s`.', static::class, __FUNCTION__))
-				->withProblem('Package `tracy/tracy` is not installed.')
-				->withSolution('Install `tracy/tracy`.');
-
-			throw InvalidState::create()
-				->withMessage($message);
+		if (!Dependencies::isPackageLoaded('tracy/tracy')) {
+			throw PackageRequired::forMethod(['tracy/tracy'], static::class, __FUNCTION__);
 		}
 
 		@mkdir($this->staticParameters['logDir']);

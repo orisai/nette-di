@@ -6,6 +6,8 @@ use Nette\DI\Compiler;
 use Nette\DI\Container;
 use Nette\DI\MissingServiceException;
 use OriNette\DI\Boot\ManualConfigurator;
+use Orisai\Utils\Dependencies\Exception\PackageRequired;
+use Orisai\Utils\Tester\DependenciesTester;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Tests\OriNette\DI\Doubles\ParametersAddingExtension;
@@ -251,6 +253,29 @@ final class BaseConfiguratorTest extends TestCase
 		self::assertSame('static', $parameters['p1']);
 		self::assertSame('compiler', $parameters['p2']);
 		self::assertSame('file', $parameters['p3']);
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 */
+	public function testTracyOptional(): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+
+		DependenciesTester::addIgnoredPackages(['tracy/tracy']);
+
+		$exception = null;
+		try {
+			$configurator->enableDebugger();
+		} catch (PackageRequired $exception) {
+			// handled below
+		}
+
+		self::assertNotNull($exception);
+		self::assertSame(
+			['tracy/tracy'],
+			$exception->getPackages(),
+		);
 	}
 
 }

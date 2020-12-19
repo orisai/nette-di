@@ -20,7 +20,8 @@
 	"require": {
 		"php": ">=7.4.0 <8.2.0",
 		"nette/di": "^3.0.5",
-		"orisai/exceptions": "^1.0.0"
+		"orisai/exceptions": "^1.0.0",
+		"orisai/utils": "^1.0.0"
 	},
 	"require-dev": {
 		"infection/infection": "^0.20.0",
