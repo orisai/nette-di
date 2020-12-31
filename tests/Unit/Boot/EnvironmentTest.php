@@ -14,6 +14,7 @@ final class EnvironmentTest extends TestCase
 
 	public function testEnvDebugMode(): void
 	{
+		unset($_SERVER['ORISAI_DEBUG']);
 		self::assertFalse(Environment::isEnvDebugMode());
 
 		$_SERVER['ORISAI_DEBUG'] = 'anything';
