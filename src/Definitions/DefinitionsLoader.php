@@ -37,14 +37,14 @@ final class DefinitionsLoader
 		if (is_string($config) && Strings::startsWith($config, '@')) {
 			$definitionName = substr($config, 1);
 
-			// Definition is already loaded, return it
-			if ($builder->hasDefinition($definitionName)) {
-				return $builder->getDefinition($definitionName);
-			}
-
 			if ($definitionName === Reference::SELF) {
 				throw InvalidArgument::create()
 					->withMessage("Referencing @self in unsupported context of {$preferredPrefix}.");
+			}
+
+			// Definition is already loaded, return it
+			if ($builder->hasDefinition($definitionName)) {
+				return $builder->getDefinition($definitionName);
 			}
 
 			// Definition not loaded yet, return Reference
