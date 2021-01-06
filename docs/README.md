@@ -195,12 +195,15 @@ Configurator define some parameters you may need:
 - `%buildDir%`
     - permanently stored cache files
     - defaults to `%rootDir%/var/build`
-- `%tempDir%`
-    - temporarily stored cache files
-    - defaults to `%rootDir%/var/tmp`
+- `%dataDir%`
+	- uploaded data
+	- defaults to `%rootDir%/data`
 - `%logDir%`
     - log files
     - defaults to `%rootDir%/var/log`
+- `%tempDir%`
+    - temporarily stored cache files
+    - defaults to `%rootDir%/var/tmp`
 - `%vendorDir%`
     - third-party source code
     - defaults to `%rootDir%/vendor`
