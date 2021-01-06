@@ -29,7 +29,7 @@ final class DefinitionsLoader
 	 * @param string|array<mixed>|Statement $config
 	 * @return Definition|Reference
 	 */
-	public function loadDefinitionFromConfig($config, string $preferredPrefix)
+	public function loadDefinitionFromConfig($config, string $prefix)
 	{
 		$builder = $this->compiler->getContainerBuilder();
 
@@ -39,8 +39,10 @@ final class DefinitionsLoader
 
 			if ($definitionName === Reference::SELF) {
 				throw InvalidArgument::create()
-					->withMessage("Referencing @self in unsupported context of {$preferredPrefix}.");
+					->withMessage("Referencing @self in unsupported context of {$prefix}.");
 			}
+
+			$builder->addAlias($prefix, $definitionName);
 
 			// Definition is already loaded, return it
 			if ($builder->hasDefinition($definitionName)) {
@@ -52,8 +54,8 @@ final class DefinitionsLoader
 		}
 
 		// Raw configuration given, create definition from it
-		$this->compiler->loadDefinitionsFromConfig([$preferredPrefix => self::doubleEscape($config)]);
-		$definition = $builder->getDefinition($preferredPrefix);
+		$this->compiler->loadDefinitionsFromConfig([$prefix => self::doubleEscape($config)]);
+		$definition = $builder->getDefinition($prefix);
 
 		// Disable autowiring for class which is defined for extension only and does not have autowiring explicitly set
 		if (!is_array($config) || !array_key_exists('autowired', $config)) {

@@ -380,7 +380,7 @@ final class ExampleExtension extends CompilerExtension
 		foreach ($config->services as $serviceName => $serviceConfig) {
 			$definition = $loader->loadDefinitionFromConfig(
 				$serviceConfig,
-                // service name which is used if not @referenced
+                // service name (in case of @referenced is defined an alias)
 				$this->prefix('definition.' . $serviceName)
 			);
 
