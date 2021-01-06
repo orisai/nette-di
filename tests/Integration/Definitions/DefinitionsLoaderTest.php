@@ -41,6 +41,9 @@ final class DefinitionsLoaderTest extends TestCase
 		$referencedService = $container->getService('referenced');
 		self::assertInstanceOf(TestService::class, $referencedService);
 
+		$referencedServiceAlias = $container->getService('loader.definition.reference');
+		self::assertSame($referencedService, $referencedServiceAlias);
+
 		$stringService = $container->getService('loader.definition.string');
 		self::assertInstanceOf(TestService::class, $stringService);
 
@@ -56,11 +59,6 @@ final class DefinitionsLoaderTest extends TestCase
 		self::assertCount(5, $container->findByType(TestService::class));
 		// Only 'referenced' from services and 'arrayWithAutowiringSet' from extension are autowired
 		self::assertCount(2, $container->findAutowired(TestService::class));
-
-		// /////
-		// Reference has own name
-		// /////
-		self::assertFalse($container->hasService('loader.definition.reference'));
 
 		// /////
 		// Double escaped message is not handled as a parameter
