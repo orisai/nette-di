@@ -74,6 +74,7 @@ final class BaseConfiguratorTest extends TestCase
 		self::assertSame($rootDir, $parameters['rootDir']);
 		self::assertSame($rootDir . '/src', $parameters['appDir']);
 		self::assertSame($rootDir . '/var/build', $parameters['buildDir']);
+		self::assertSame($rootDir . '/data', $parameters['dataDir']);
 		self::assertSame($rootDir . '/var/log', $parameters['logDir']);
 		self::assertSame($rootDir . '/var/cache', $parameters['tempDir']);
 		self::assertSame($rootDir . '/vendor', $parameters['vendorDir']);
@@ -86,6 +87,9 @@ final class BaseConfiguratorTest extends TestCase
 		self::assertArrayHasKey('compiledAtTimestamp', $parameters['container']);
 		self::assertArrayHasKey('compiledAt', $parameters['container']);
 		self::assertArrayHasKey('className', $parameters['container']);
+
+		// 10 default + 1 dynamic (container) + 2 from test
+		self::assertCount(10 + 1 + 2, $parameters);
 	}
 
 	public function testParametersSpecificContainer(): void

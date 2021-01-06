@@ -74,6 +74,7 @@ abstract class BaseConfigurator
 			'rootDir' => $this->rootDir,
 			'appDir' => $this->rootDir . '/src',
 			'buildDir' => $this->rootDir . '/var/build',
+			'dataDir' => $this->rootDir . '/data',
 			'logDir' => $this->rootDir . '/var/log',
 			'tempDir' => $this->rootDir . '/var/cache',
 			'vendorDir' => $this->rootDir . '/vendor',
