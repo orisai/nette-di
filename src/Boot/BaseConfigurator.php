@@ -105,7 +105,7 @@ abstract class BaseConfigurator
 			throw PackageRequired::forMethod(['tracy/tracy'], static::class, __FUNCTION__);
 		}
 
-		@mkdir($this->staticParameters['logDir']);
+		@mkdir($this->staticParameters['logDir'], 0_777, true);
 		Debugger::$strictMode = true;
 		Debugger::enable(
 			$this->isDebugMode() ? Debugger::DEVELOPMENT : Debugger::PRODUCTION,
