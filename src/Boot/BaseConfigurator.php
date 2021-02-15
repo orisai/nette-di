@@ -7,6 +7,7 @@ use Composer\Autoload\ClassLoader;
 use Countable;
 use DateTimeImmutable;
 use IteratorAggregate;
+use Latte\Bridges\Tracy\BlueScreenPanel as LatteBlueScreenPanel;
 use Nette\DI\Compiler;
 use Nette\DI\Config\Loader;
 use Nette\DI\Container;
@@ -112,6 +113,9 @@ abstract class BaseConfigurator
 			$this->staticParameters['logDir'],
 		);
 		Bridge::initialize();
+		if (class_exists(LatteBlueScreenPanel::class)) {
+			LatteBlueScreenPanel::initialize();
+		}
 	}
 
 	/**
