@@ -3,6 +3,7 @@
 namespace OriNette\DI\Boot;
 
 use ArrayAccess;
+use Closure;
 use Composer\Autoload\ClassLoader;
 use Countable;
 use DateTimeImmutable;
@@ -43,8 +44,8 @@ abstract class BaseConfigurator
 	protected string $rootDir;
 
 	/**
-	 * @var array<callable>
-	 * @phpstan-var array<callable(Compiler $compiler): void>
+	 * @var array<Closure>
+	 * @phpstan-var array<Closure(Compiler $compiler): void>
 	 */
 	public array $onCompile = [];
 
