@@ -24,7 +24,7 @@
 		"orisai/utils": "^1.0.0"
 	},
 	"require-dev": {
-		"infection/infection": "^0.20.0",
+		"infection/infection": "^0.22.1",
 		"latte/latte": "^2.10.0",
 		"orisai/coding-standard": "^2.0.0",
 		"pepakriz/phpstan-exception-rules": "^0.11.0",
