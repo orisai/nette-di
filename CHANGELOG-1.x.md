@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- `ManualConfigurator`
-- `Environment`
-- `DefinitionsLoader`
+- Boot
+	- `ManualConfigurator`
+	- `Environment`
+- Definitions
+	- `DefinitionsLoader`
+- Services
+	- `ServiceManager`
+	- `CachedServiceManager`
