@@ -13,13 +13,13 @@ use function get_class;
 abstract class ServiceManager
 {
 
-	/** @var array<string, string> */
+	/** @var array<int|string, string> */
 	private array $serviceMap;
 
 	private Container $container;
 
 	/**
-	 * @param array<string, string> $serviceMap
+	 * @param array<int|string, string> $serviceMap
 	 */
 	final public function __construct(array $serviceMap, Container $container)
 	{
@@ -27,12 +27,18 @@ abstract class ServiceManager
 		$this->container = $container;
 	}
 
-	protected function hasService(string $key): bool
+	/**
+	 * @param int|string $key
+	 */
+	protected function hasService($key): bool
 	{
 		return array_key_exists($key, $this->serviceMap);
 	}
 
-	protected function getService(string $key): ?object
+	/**
+	 * @param int|string $key
+	 */
+	protected function getService($key): ?object
 	{
 		$serviceName = $this->serviceMap[$key] ?? null;
 		if ($serviceName === null) {
@@ -42,13 +48,16 @@ abstract class ServiceManager
 		return $this->container->getService($serviceName);
 	}
 
-	protected function getServiceName(string $key): string
+	/**
+	 * @param int|string $key
+	 */
+	protected function getServiceName($key): string
 	{
 		return $this->serviceMap[$key];
 	}
 
 	/**
-	 * @return array<string>
+	 * @return array<int|string>
 	 */
 	protected function getKeys(): array
 	{
@@ -56,10 +65,11 @@ abstract class ServiceManager
 	}
 
 	/**
+	 * @param int|string $key
 	 * @param class-string $expectedClass
 	 * @return never-return
 	 */
-	protected function throwMissingService(string $key, string $expectedClass): void
+	protected function throwMissingService($key, string $expectedClass): void
 	{
 		$selfClass = static::class;
 		$className = Classes::getShortName($selfClass);
@@ -74,10 +84,11 @@ abstract class ServiceManager
 	}
 
 	/**
+	 * @param int|string $key
 	 * @param class-string $expectedClass
 	 * @return never-return
 	 */
-	protected function throwInvalidServiceType(string $key, string $expectedClass, object $service): void
+	protected function throwInvalidServiceType($key, string $expectedClass, object $service): void
 	{
 		$serviceClass = get_class($service);
 		$serviceName = $this->getServiceName($key);
