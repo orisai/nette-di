@@ -15,6 +15,7 @@ use Nette\DI\Container;
 use Nette\DI\ContainerLoader;
 use Nette\DI\Extensions\ExtensionsExtension;
 use Nette\DI\Helpers as DIHelpers;
+use Nette\PhpGenerator\PhpLiteral;
 use Nette\Schema\Helpers as ConfigHelpers;
 use Orisai\Utils\Dependencies\Dependencies;
 use Orisai\Utils\Dependencies\Exception\PackageRequired;
@@ -168,6 +169,7 @@ abstract class BaseConfigurator
 				'container' => [
 					'compiledAtTimestamp' => (int) $now->format('U'),
 					'compiledAt' => $now->format(DATE_ATOM),
+					'className' => new PhpLiteral('static::class'),
 				],
 			];
 		$compiler->addConfig(['parameters' => $parameters]);
@@ -230,8 +232,6 @@ abstract class BaseConfigurator
 	{
 		$containerClass = $this->loadContainer();
 		$container = new $containerClass($this->dynamicParameters);
-
-		$container->parameters['container']['className'] = $containerClass;
 
 		foreach ($this->services as $name => $service) {
 			$container->addService($name, $service);
