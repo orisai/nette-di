@@ -6,7 +6,6 @@ use Orisai\Exceptions\Logic\InvalidArgument;
 use Orisai\Exceptions\Message;
 use function array_key_exists;
 use function array_shift;
-use function assert;
 use function count;
 use function explode;
 use function in_array;
@@ -69,7 +68,6 @@ final class Environment
 			if ($prefix === '' || strpos($key, $prefix) === 0) {
 				// Parse PREFIX{delimiter}{NAME-1}{delimiter}{NAME-N}
 				$keys = explode($delimiter, strtolower(substr($key, strlen($prefix))));
-				assert($keys !== false);
 				// Make array structure
 				$map($parameters, $keys, $value);
 			}
