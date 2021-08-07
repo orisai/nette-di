@@ -22,6 +22,7 @@ Configure your Orisai CMF/Nette application
 ## Configurator
 
 An alternative for [nette/bootstrap](https://github.com/nette/bootstrap)
+
 - none of the extensions is loaded by default
 - debug mode is disabled unless you enable it
 
@@ -98,6 +99,7 @@ $configurator->setDebugMode($condition);
 ```
 
 After you set debug mode, enable debugger
+
 - Requires [Tracy](https://github.com/nette/tracy) to be installed
 
 ```php
@@ -175,8 +177,8 @@ When a static parameter is added, removed or it's value changes then container i
 
 #### Dynamic parameters
 
-Dynamic parameter value can be changed each request.
-Only when parameter is added or removed. then container is re-generated.
+Dynamic parameter value can be changed each request. Only when parameter is added or removed. then container is
+re-generated.
 
 ```php
 $configurator->addDynamicParameters([
@@ -187,35 +189,35 @@ $configurator->addDynamicParameters([
 #### Predefined parameters
 
 Configurator define some parameters you may need:
+
 - `%rootDir%`
-    - base path of your app
+	- base path of your app
 - `%appDir%`
-    - source code path
-    - defaults to `%rootDir%/src`
+	- source code path
+	- defaults to `%rootDir%/src`
 - `%buildDir%`
-    - permanently stored cache files
-    - defaults to `%rootDir%/var/build`
+	- permanently stored cache files
+	- defaults to `%rootDir%/var/build`
 - `%dataDir%`
 	- uploaded data
 	- defaults to `%rootDir%/data`
 - `%logDir%`
-    - log files
-    - defaults to `%rootDir%/var/log`
+	- log files
+	- defaults to `%rootDir%/var/log`
 - `%tempDir%`
-    - temporarily stored cache files
-    - defaults to `%rootDir%/var/tmp`
+	- temporarily stored cache files
+	- defaults to `%rootDir%/var/tmp`
 - `%vendorDir%`
-    - third-party source code
-    - defaults to `%rootDir%/vendor`
+	- third-party source code
+	- defaults to `%rootDir%/vendor`
 - `%wwwDir%`
-  	- public directory, should be the only one accessible via webserver
-  	- defaults to `%rootDir%/public`
+  - public directory, should be the only one accessible via webserver - defaults to `%rootDir%/public`
 - `%debugMode%`
-    - whether application is in debug mode
+	- whether application is in debug mode
 - `%consoleMode%`
-    - whether application is in console mode
+	- whether application is in console mode
 - `%container%`
-    - info about container - when it was compiled, name of the container
+	- info about container - when it was compiled, name of the container
 
 #### Load parameters from env variables
 
@@ -228,6 +230,7 @@ $configurator->addStaticParameters(Environment::loadEnvParameters());
 ```
 
 Env variables are transformed into array via pattern `PREFIX{delimiter}{NAME-1}{delimiter}{NAME-N}`.
+
 - default prefix is `ORISAI` and delimiter is `__`
 
 In following example is how env variable look and the resulting parameters after transformation
@@ -263,8 +266,8 @@ This method uses `$_SERVER` instead of `getenv()` and so is safe to use under an
 
 ### Import services
 
-In rare cases it may be useful to import a service into DI container via configurator.
-To do so, register service with `imported: true`.
+In rare cases it may be useful to import a service into DI container via configurator. To do so, register service
+with `imported: true`.
 
 ```neon
 services:
@@ -283,7 +286,8 @@ $configurator->addServices([
 
 ### Compilation
 
-In rare cases it may be useful to do something only when new `Container` is compiled. In such case, use the `onCompile` event.
+In rare cases it may be useful to do something only when new `Container` is compiled. In such case, use the `onCompile`
+event.
 
 ```php
 use Nette\DI\Compiler;
@@ -323,14 +327,14 @@ $configurator->loadContainer();
 
 ## Definitions loader
 
-Extensions can accept services in any format which is allowed by `services` section in the configuration and also
-accept references via `@serviceName` to services from `services`. To achieve this follow example below:
+Extensions can accept services in any format which is allowed by `services` section in the configuration and also accept
+references via `@serviceName` to services from `services`. To achieve this follow example below:
 
 These are all valid ways how to write a service:
 
 ```neon
 extensions:
-    example: ExampleExtension
+	example: ExampleExtension
 
 services:
 	referenced: ExampleService
@@ -344,8 +348,8 @@ example:
 			factory: ExampleService
 ```
 
-Services loaded via `DefinitionsLoader` are *not autowired* by default because they are extension-specific.
-Autowiring of services referenced via `@serviceName` or with `autowired` explicitly set is not changed.
+Services loaded via `DefinitionsLoader` are *not autowired* by default because they are extension-specific. Autowiring
+of services referenced via `@serviceName` or with `autowired` explicitly set is not changed.
 
 ```neon
 example:
@@ -386,12 +390,12 @@ final class ExampleExtension extends CompilerExtension
 		foreach ($config->services as $serviceName => $serviceConfig) {
 			$definition = $loader->loadDefinitionFromConfig(
 				$serviceConfig,
-                // service name (in case of @referenced is defined an alias)
+				// service name (in case of @referenced is defined an alias)
 				$this->prefix('definition.' . $serviceName)
 			);
 
 			// Do anything you want with the definition
-            //  - returns Reference if @referenced service was not loaded yet or instance of Definition otherwise
+			//  - returns Reference if @referenced service was not loaded yet or instance of Definition otherwise
 		}
 	}
 
