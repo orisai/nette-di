@@ -3,7 +3,6 @@
 namespace OriNette\DI\Services;
 
 use Nette\DI\Container;
-use Orisai\Exceptions\Logic\InvalidArgument;
 use Orisai\Exceptions\Message;
 use Orisai\Utils\Classes;
 use function array_key_exists;
@@ -79,7 +78,7 @@ abstract class ServiceManager
 			->withProblem("No service is registered under that key but service of type $expectedClass is required.")
 			->withSolution("Add service with key $key to $className.");
 
-		throw InvalidArgument::create()
+		throw MissingService::create()
 			->withMessage($message);
 	}
 
@@ -100,7 +99,7 @@ abstract class ServiceManager
 			->withProblem("$selfClass supports only instances of $expectedClass.")
 			->withSolution("Remove service from $className or make the service return supported object type.");
 
-		throw InvalidArgument::create()
+		throw MissingService::create()
 			->withMessage($message);
 	}
 
