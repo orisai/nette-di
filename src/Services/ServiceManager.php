@@ -67,7 +67,7 @@ abstract class ServiceManager
 	/**
 	 * @param int|string $key
 	 * @param class-string $expectedClass
-	 * @return never-return
+	 * @return never
 	 */
 	protected function throwMissingService($key, string $expectedClass): void
 	{
@@ -86,7 +86,7 @@ abstract class ServiceManager
 	/**
 	 * @param int|string $key
 	 * @param class-string $expectedClass
-	 * @return never-return
+	 * @return never
 	 */
 	protected function throwInvalidServiceType($key, string $expectedClass, object $service): void
 	{
