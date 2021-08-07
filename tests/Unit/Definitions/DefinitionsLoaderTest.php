@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Tests\OriNette\DI\Integration\Definitions;
+namespace Tests\OriNette\DI\Unit\Definitions;
 
 use Generator;
 use Nette\DI\Compiler;

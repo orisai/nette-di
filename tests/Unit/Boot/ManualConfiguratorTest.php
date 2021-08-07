@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Tests\OriNette\DI\Integration\Boot;
+namespace Tests\OriNette\DI\Unit\Boot;
 
 use OriNette\DI\Boot\ManualConfigurator;
 use PHPUnit\Framework\TestCase;
