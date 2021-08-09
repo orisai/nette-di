@@ -7,6 +7,7 @@ use Nette\DI\Compiler;
 use OriNette\DI\Boot\ManualConfigurator;
 use Orisai\Exceptions\Logic\InvalidArgument;
 use PHPUnit\Framework\TestCase;
+use Tests\OriNette\DI\Doubles\AnotherTestService;
 use Tests\OriNette\DI\Doubles\DefinitionsList;
 use Tests\OriNette\DI\Doubles\DefinitionsLoadingExtension;
 use Tests\OriNette\DI\Doubles\TestService;
@@ -43,6 +44,15 @@ final class DefinitionsLoaderTest extends TestCase
 
 		$referencedServiceAlias = $container->getService('loader.definition.reference');
 		self::assertSame($referencedService, $referencedServiceAlias);
+
+		$referencedClassService = $container->getService('referencedClass');
+		self::assertInstanceOf(AnotherTestService::class, $referencedClassService);
+
+		// Can't support alias for unresolved type reference
+		if ($loadLater) {
+			$referencedClassServiceAlias = $container->getService('loader.definition.referenceClass');
+			self::assertSame($referencedClassService, $referencedClassServiceAlias);
+		}
 
 		$stringService = $container->getService('loader.definition.string');
 		self::assertInstanceOf(TestService::class, $stringService);
@@ -93,6 +103,22 @@ final class DefinitionsLoaderTest extends TestCase
 				'isSelf' => false,
 				'service' => $referencedService,
 			];
+		$referencedClassDefinition = $loadLater
+			? [
+				'type' => 'definition',
+				'name' => 'referencedClass',
+				'serviceType' => AnotherTestService::class,
+				'autowired' => false,
+				'service' => $referencedClassService,
+			]
+			: [
+				'type' => 'reference',
+				'value' => AnotherTestService::class,
+				'isName' => false,
+				'isType' => true,
+				'isSelf' => false,
+				'service' => $referencedClassService,
+			];
 
 		$list = $container->getByType(DefinitionsList::class);
 		self::assertSame(
@@ -112,6 +138,7 @@ final class DefinitionsLoaderTest extends TestCase
 					'service' => $statementService,
 				],
 				'loader.definition.reference' => $referencedDefinition,
+				'loader.definition.referenceClass' => $referencedClassDefinition,
 				'loader.definition.array' => [
 					'type' => 'definition',
 					'name' => 'loader.definition.array',

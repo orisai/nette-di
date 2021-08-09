@@ -42,14 +42,23 @@ final class DefinitionsLoader
 					->withMessage("Referencing @self in unsupported context of {$prefix}.");
 			}
 
-			$builder->addAlias($prefix, $definitionName);
-
 			// Definition is already loaded, return it
 			if ($builder->hasDefinition($definitionName)) {
+				$builder->addAlias($prefix, $definitionName);
+
 				return $builder->getDefinition($definitionName);
 			}
 
+			$serviceName = $builder->getByType($definitionName);
+			if ($serviceName !== null) {
+				$builder->addAlias($prefix, $serviceName);
+
+				return $builder->getDefinition($serviceName);
+			}
+
 			// Definition not loaded yet, return Reference
+			$builder->addAlias($prefix, $definitionName);
+
 			return new Reference($definitionName);
 		}
 

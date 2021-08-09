@@ -338,12 +338,14 @@ extensions:
 
 services:
 	referenced: ExampleService
+	referencedByType: AnotherExampleService
 
 example:
 	services:
 		string: ExampleService
 		statement: ExampleService()
 		reference: @referenced
+		referenceByType: @AnotherExampleService
 		array:
 			factory: ExampleService
 ```

@@ -39,6 +39,8 @@ final class DefinitionsLoadingExtension extends CompilerExtension
 	{
 		parent::loadConfiguration();
 
+		$this->getContainerBuilder()->addDependency(DefinitionsLoader::class);
+
 		if (!$this->loadLater) {
 			$this->loadIt();
 		}
