@@ -2,6 +2,8 @@
 
 namespace OriNette\DI\Boot;
 
+use Nette\DI\Config\Adapter;
+
 final class ManualConfigurator extends BaseConfigurator
 {
 
@@ -11,6 +13,11 @@ final class ManualConfigurator extends BaseConfigurator
 	public function addConfig(string $configFile): void
 	{
 		$this->configs[] = $configFile;
+	}
+
+	public function addConfigAdapter(string $extension, Adapter $adapter): void
+	{
+		$this->configAdapters[$extension] = $adapter;
 	}
 
 	/**

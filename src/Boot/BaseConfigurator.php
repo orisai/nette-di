@@ -10,6 +10,7 @@ use DateTimeImmutable;
 use IteratorAggregate;
 use Latte\Bridges\Tracy\BlueScreenPanel as LatteBlueScreenPanel;
 use Nette\DI\Compiler;
+use Nette\DI\Config\Adapter;
 use Nette\DI\Config\Loader;
 use Nette\DI\Container;
 use Nette\DI\ContainerLoader;
@@ -61,6 +62,9 @@ abstract class BaseConfigurator
 
 	/** @var array<string, object> */
 	protected array $services = [];
+
+	/** @var array<string, Adapter> */
+	protected array $configAdapters = [];
 
 	public function __construct(string $rootDir)
 	{
@@ -157,6 +161,10 @@ abstract class BaseConfigurator
 	{
 		$loader = new Loader();
 		$loader->setParameters($this->staticParameters);
+
+		foreach ($this->configAdapters as $extension => $adapter) {
+			$loader->addAdapter($extension, $adapter);
+		}
 
 		foreach ($configFiles as $configFile) {
 			$compiler->loadConfig($configFile, $loader);

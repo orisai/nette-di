@@ -90,6 +90,12 @@ Add config files
 $configurator->addConfig(__DIR__ . '/../config/common.neon');
 ```
 
+By default, `neon` and `php` files supported. For other formats, add an own adapter:
+
+```php
+$configurator->addConfigAdapter('json', new JsonAdapter());
+```
+
 ### Debug mode
 
 Set debug mode
