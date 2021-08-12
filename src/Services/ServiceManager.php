@@ -8,6 +8,7 @@ use Orisai\Utils\Classes;
 use function array_key_exists;
 use function array_keys;
 use function get_class;
+use function is_a;
 
 abstract class ServiceManager
 {
@@ -45,6 +46,48 @@ abstract class ServiceManager
 		}
 
 		return $this->container->getService($serviceName);
+	}
+
+	/**
+	 * @template T of object
+	 * @param int|string $key
+	 * @param class-string<T> $type
+	 * @return T|null
+	 */
+	protected function getTypedService($key, string $type): ?object
+	{
+		$service = $this->getService($key);
+
+		if ($service === null) {
+			return null;
+		}
+
+		if (!is_a($service, $type)) {
+			$this->throwInvalidServiceType($key, $type, $service);
+		}
+
+		return $service;
+	}
+
+	/**
+	 * @template T of object
+	 * @param int|string $key
+	 * @param class-string<T> $type
+	 * @return T
+	 */
+	protected function getTypedServiceOrThrow($key, string $type): object
+	{
+		$service = $this->getService($key);
+
+		if ($service === null) {
+			$this->throwMissingService($key, $type);
+		}
+
+		if (!is_a($service, $type)) {
+			$this->throwInvalidServiceType($key, $type, $service);
+		}
+
+		return $service;
 	}
 
 	/**
