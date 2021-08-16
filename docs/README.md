@@ -371,7 +371,6 @@ Integration of `DefinitionsLoader` which would load these definitions may look l
 
 ```php
 use Nette\DI\CompilerExtension;
-use Nette\DI\Definitions\Statement;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use OriNette\DI\Definitions\DefinitionsLoader;
@@ -383,7 +382,7 @@ final class ExampleExtension extends CompilerExtension
 	{
 		return Expect::structure([
 			'services' => Expect::arrayOf(
-				Expect::anyOf(Expect::string(), Expect::array(), Expect::type(Statement::class)),
+				DefinitionsLoader::schema(),
 			),
 		]);
 	}

@@ -6,7 +6,6 @@ use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\Definition;
 use Nette\DI\Definitions\Reference;
 use Nette\DI\Definitions\ServiceDefinition;
-use Nette\DI\Definitions\Statement;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use OriNette\DI\Definitions\DefinitionsLoader;
@@ -30,7 +29,7 @@ final class DefinitionsLoadingExtension extends CompilerExtension
 	{
 		return Expect::structure([
 			'definitions' => Expect::arrayOf(
-				Expect::anyOf(Expect::string(), Expect::array(), Expect::type(Statement::class)),
+				DefinitionsLoader::schema(),
 			),
 		]);
 	}

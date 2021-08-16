@@ -6,6 +6,8 @@ use Nette\DI\Compiler;
 use Nette\DI\Definitions\Definition;
 use Nette\DI\Definitions\Reference;
 use Nette\DI\Definitions\Statement;
+use Nette\Schema\Expect;
+use Nette\Schema\Schema;
 use Nette\Utils\Strings;
 use Orisai\Exceptions\Logic\InvalidArgument;
 use function array_key_exists;
@@ -24,6 +26,15 @@ final class DefinitionsLoader
 	public function __construct(Compiler $compiler)
 	{
 		$this->compiler = $compiler;
+	}
+
+	public static function schema(): Schema
+	{
+		return Expect::anyOf(
+			Expect::string(),
+			Expect::array(),
+			Expect::type(Statement::class),
+		);
 	}
 
 	/**
