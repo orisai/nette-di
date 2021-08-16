@@ -9,6 +9,7 @@ use Nette\DI\Definitions\Statement;
 use Nette\Utils\Strings;
 use Orisai\Exceptions\Logic\InvalidArgument;
 use function array_key_exists;
+use function class_exists;
 use function is_array;
 use function is_string;
 use function preg_replace;
@@ -57,7 +58,9 @@ final class DefinitionsLoader
 			}
 
 			// Definition not loaded yet, return Reference
-			$builder->addAlias($prefix, $definitionName);
+			if (!class_exists($definitionName)) {
+				$builder->addAlias($prefix, $definitionName);
+			}
 
 			return new Reference($definitionName);
 		}
