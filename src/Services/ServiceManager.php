@@ -4,7 +4,7 @@ namespace OriNette\DI\Services;
 
 use Nette\DI\Container;
 use Orisai\Exceptions\Message;
-use Orisai\Utils\Classes;
+use Orisai\Utils\Reflection\Classes;
 use function array_key_exists;
 use function array_keys;
 use function get_class;
