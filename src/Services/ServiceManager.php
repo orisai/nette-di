@@ -3,6 +3,7 @@
 namespace OriNette\DI\Services;
 
 use Nette\DI\Container;
+use Orisai\Exceptions\Logic\InvalidArgument;
 use Orisai\Exceptions\Message;
 use Orisai\Utils\Reflection\Classes;
 use function array_key_exists;
@@ -50,7 +51,7 @@ abstract class ServiceManager
 
 	/**
 	 * @template T of object
-	 * @param int|string $key
+	 * @param int|string      $key
 	 * @param class-string<T> $type
 	 * @return T|null
 	 */
@@ -71,7 +72,7 @@ abstract class ServiceManager
 
 	/**
 	 * @template T of object
-	 * @param int|string $key
+	 * @param int|string      $key
 	 * @param class-string<T> $type
 	 * @return T
 	 */
@@ -95,11 +96,24 @@ abstract class ServiceManager
 	 */
 	protected function getServiceName($key): string
 	{
+		if (!isset($this->serviceMap[$key])) {
+			$class = static::class;
+			$function = __FUNCTION__;
+
+			$message = Message::create()
+				->withContext("Trying to call $class->$function().")
+				->withProblem("Given key '$key' has no service associated.")
+				->withSolution('Call it only with key which exists in service map.');
+
+			throw InvalidArgument::create()
+				->withMessage($message);
+		}
+
 		return $this->serviceMap[$key];
 	}
 
 	/**
-	 * @return array<int|string>
+	 * @return array<int, int|string>
 	 */
 	protected function getKeys(): array
 	{
@@ -107,30 +121,30 @@ abstract class ServiceManager
 	}
 
 	/**
-	 * @param int|string $key
-	 * @param class-string $expectedClass
+	 * @param int|string   $key
+	 * @param class-string $expectedType
 	 * @return never
 	 */
-	protected function throwMissingService($key, string $expectedClass): void
+	protected function throwMissingService($key, string $expectedType): void
 	{
 		$selfClass = static::class;
 		$className = Classes::getShortName($selfClass);
 
 		$message = Message::create()
-			->withContext("Trying to get service by key $key from $selfClass.")
-			->withProblem("No service is registered under that key but service of type $expectedClass is required.")
-			->withSolution("Add service with key $key to $className.");
+			->withContext("Trying to get service by key '$key' from $selfClass.")
+			->withProblem("No service is registered under that key but service of type $expectedType is required.")
+			->withSolution("Add service with key '$key' to $className.");
 
-		throw MissingService::create()
+		throw InvalidArgument::create()
 			->withMessage($message);
 	}
 
 	/**
-	 * @param int|string $key
-	 * @param class-string $expectedClass
+	 * @param int|string   $key
+	 * @param class-string $expectedType
 	 * @return never
 	 */
-	protected function throwInvalidServiceType($key, string $expectedClass, object $service): void
+	protected function throwInvalidServiceType($key, string $expectedType, object $service): void
 	{
 		$serviceClass = get_class($service);
 		$serviceName = $this->getServiceName($key);
@@ -138,11 +152,11 @@ abstract class ServiceManager
 		$className = Classes::getShortName($selfClass);
 
 		$message = Message::create()
-			->withContext("Service $serviceName returns instance of $serviceClass.")
-			->withProblem("$selfClass supports only instances of $expectedClass.")
+			->withContext("Service '$serviceName' returns instance of $serviceClass.")
+			->withProblem("$selfClass supports only instances of $expectedType.")
 			->withSolution("Remove service from $className or make the service return supported object type.");
 
-		throw MissingService::create()
+		throw InvalidArgument::create()
 			->withMessage($message);
 	}
 

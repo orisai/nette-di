@@ -18,6 +18,7 @@ Configure your Orisai CMF/Nette application
 	- [Compilation](#compilation)
 	- [Cache warmup](#cache-warmup)
 - [Definitions loader](#definitions-loader)
+- [Service manager](#service-manager)
 
 ## Configurator
 
@@ -45,9 +46,9 @@ final class Bootstrap
 		$configurator->addStaticParameters(Environment::loadEnvParameters());
 
 		$configurator->setDebugMode(
-			Environment::isEnvDebugMode() ||
-			Environment::isLocalhost() ||
-			Environment::hasCookie(self::getDebugCookieValues()),
+			Environment::isEnvDebugMode()
+			|| Environment::isLocalhost()
+			|| Environment::hasCookie(self::getDebugCookieValues()),
 		);
 		$configurator->enableDebugger();
 
@@ -58,7 +59,7 @@ final class Bootstrap
 	}
 
 	/**
-	 * @return array
+	 * @return array<string>
  	 */
 	private static function getDebugCookieValues(): array
 	{
@@ -217,7 +218,7 @@ Configurator define some parameters you may need:
 	- third-party source code
 	- defaults to `%rootDir%/vendor`
 - `%wwwDir%`
-  - public directory, should be the only one accessible via webserver - defaults to `%rootDir%/public`
+	- public directory, should be the only one accessible via webserver - defaults to `%rootDir%/public`
 - `%debugMode%`
 	- whether application is in debug mode
 - `%consoleMode%`
@@ -408,3 +409,90 @@ final class ExampleExtension extends CompilerExtension
 
 }
 ```
+
+## Service manager
+
+`ServiceManager` is a base class useful for lazy loading of multiple services of the same type.
+
+Internally it uses array of service names obtainable by keys from DI container.
+
+Note: Same as [nette/di](https://github.com/nette/di/) factories and accessors, this is not a service locator pattern,
+because obtained services are fully configured from outside.
+
+Example implementation which returns all services and validates they exist and are of certain type may look like this:
+
+```php
+use OriNette\DI\Services\ServiceManager;
+
+final class ExampleManager extends ServiceManager
+{
+
+	/** @var array<Example>|null */
+	private ?array $examples = null;
+
+	/**
+	 * @return array<Example>
+	 */
+	public function getAll(): array
+	{
+		if ($this->examples !== null) {
+			return $this->examples;
+		}
+
+		$loaders = [];
+		foreach ($this->getKeys() as $key) {
+			$loaders[$key] = $this->getTypedServiceOrThrow($key, Example::class);
+		}
+
+		return $this->examples = $loaders;
+	}
+
+```
+
+Or get services one by one, with possible nulls:
+
+```php
+use OriNette\DI\Services\ServiceManager;
+
+final class ExampleManager extends ServiceManager
+{
+
+	/** @var array<int|string, Example|null> */
+	private array $examples = [];
+
+	/**
+	 * @param int|string $key
+	 */
+	public function get($key): ?Example
+	{
+		if (array_key_exists($key, $this->examples)) {
+			return $this->examples[$key];
+		}
+
+		return $this->examples[$key] = $this->getTypedService($key, Example::class);
+	}
+
+}
+```
+
+Service manager may be registered in config like this:
+
+```neon
+services:
+	- factory: ExampleManager
+	  arguments:
+		serviceMap:
+			key: service.name
+			anotherKey: another.service.name
+```
+
+You may combine various *protected* methods of `ServiceManager` to achieve various goals:
+
+- `hasService(int|string $key): bool`
+- `getService(int|string $key): ?object`
+- `getTypedService(int|string $key, class-string<T> $type): ?T`
+- `getTypedServiceOrThrow(int|string $key, class-string<T> $type): T`
+- `getServiceName(int|string $key): string`
+- `getKeys(): array<int, int|string>`
+- `throwMissingService(int|string $key, class-string $expectedType): never`
+- `throwInvalidServiceType(int|string $key, class-string $expectedType, object $service): never`

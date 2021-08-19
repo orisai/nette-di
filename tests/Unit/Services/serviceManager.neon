@@ -1,0 +1,9 @@
+services:
+	manager:
+		factory: Tests\OriNette\DI\Doubles\TestingServiceManager
+		arguments:
+			serviceMap:
+				missing: service.missing
+				test: service.test
+
+	service.test: Tests\OriNette\DI\Doubles\TestService
