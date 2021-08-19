@@ -29,6 +29,7 @@ use function array_keys;
 use function assert;
 use function class_exists;
 use function filemtime;
+use function is_array;
 use function is_subclass_of;
 use function method_exists;
 use function mkdir;
@@ -77,6 +78,7 @@ abstract class BaseConfigurator
 	 */
 	protected function getDefaultParameters(): array
 	{
+		/** @infection-ignore-all */
 		return [
 			'rootDir' => $this->rootDir,
 			'appDir' => $this->rootDir . '/src',
@@ -118,7 +120,9 @@ abstract class BaseConfigurator
 			$this->isDebugMode() ? Debugger::DEVELOPMENT : Debugger::PRODUCTION,
 			$this->staticParameters['logDir'],
 		);
+		/** @infection-ignore-all */
 		Bridge::initialize();
+		/** @infection-ignore-all */
 		if (class_exists(LatteBlueScreenPanel::class)) {
 			LatteBlueScreenPanel::initialize();
 		}
@@ -129,7 +133,10 @@ abstract class BaseConfigurator
 	 */
 	public function addStaticParameters(array $parameters): self
 	{
-		$this->staticParameters = (array) ConfigHelpers::merge($parameters, $this->staticParameters);
+		$merged = ConfigHelpers::merge($parameters, $this->staticParameters);
+		assert(is_array($merged));
+
+		$this->staticParameters = $merged;
 
 		return $this;
 	}
@@ -209,6 +216,7 @@ abstract class BaseConfigurator
 	public function loadContainer(): string
 	{
 		$loader = new ContainerLoader(
+			/** @infection-ignore-all */
 			$this->staticParameters['buildDir'] . '/orisai.di.configurator',
 			$this->staticParameters['debugMode'],
 		);
@@ -219,6 +227,7 @@ abstract class BaseConfigurator
 			function (Compiler $compiler) use ($configFiles): void {
 				$this->generateContainer($compiler, $configFiles);
 			},
+			/** @infection-ignore-all */
 			[
 				$this->staticParameters,
 				array_keys($this->dynamicParameters),

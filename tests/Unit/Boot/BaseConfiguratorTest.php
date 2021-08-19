@@ -11,6 +11,7 @@ use Orisai\Utils\Dependencies\Exception\PackageRequired;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Tests\OriNette\DI\Doubles\ParametersAddingExtension;
+use Tests\OriNette\DI\Doubles\TestingConfigurator;
 use Tests\OriNette\DI\Doubles\TestService;
 use Tracy\Debugger;
 use function class_exists;
@@ -57,7 +58,7 @@ final class BaseConfiguratorTest extends TestCase
 	public function testParametersMatch(): void
 	{
 		$rootDir = $this->rootDir;
-		$configurator = new ManualConfigurator($rootDir);
+		$configurator = new TestingConfigurator($rootDir);
 
 		self::assertSame(PHP_SAPI === 'cli', $configurator->isConsoleMode());
 
@@ -90,6 +91,7 @@ final class BaseConfiguratorTest extends TestCase
 
 		// 10 default + 1 dynamic (container) + 2 from test
 		self::assertCount(10 + 1 + 2, $parameters);
+		self::assertCount(10, $configurator->getDefaultParameters());
 	}
 
 	public function testParametersSpecificContainer(): void
