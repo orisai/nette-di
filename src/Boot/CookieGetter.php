@@ -14,9 +14,11 @@ final class CookieGetter
 	 */
 	public static function fromEnv(string $variableName = 'DEBUG_COOKIE_VALUES', string $valueSeparator = ','): array
 	{
-		$var = $_SERVER[$variableName] ?? '';
+		if (!isset($_SERVER[$variableName])) {
+			return [];
+		}
 
-		return explode($valueSeparator, $var);
+		return explode($valueSeparator, $_SERVER[$variableName]);
 	}
 
 }

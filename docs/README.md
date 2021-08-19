@@ -142,6 +142,8 @@ $configurator->setDebugMode(Environment::isEnvDebugMode());
 We can also change the variable name to something else
 
 ```php
+use OriNette\DI\Boot\Environment;
+
 Environment::isEnvDebugMode('VARIABLE_NAME');
 ```
 
@@ -162,12 +164,26 @@ $configurator->setDebugMode(Environment::hasCookie([
 ]));
 ```
 
-*Be paranoid and always generate long cookie values like 100 characters long*
+*Be paranoid and always generate long cookie values like 30+ characters long*
 
 We can also change the cookie name to something else
 
 ```php
+use OriNette\DI\Boot\Environment;
+
 Environment::hasCookie($cookieValues, 'cookie-name');
+```
+
+List of cookie values can be easily obtained from an env variable
+
+- By default is expected env variable `DEBUG_COOKIE_VALUES` with values separated by a comma
+	- `DEBUG_COOKIE_VALUES = val1,val2`
+
+```php
+use OriNette\DI\Boot\CookieGetter;
+use OriNette\DI\Boot\Environment;
+
+Environment::hasCookie(CookieGetter::fromEnv());
 ```
 
 ### Parameters
