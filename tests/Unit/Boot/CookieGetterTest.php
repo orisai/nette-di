@@ -36,6 +36,12 @@ final class CookieGetterTest extends TestCase
 			['foo', 'bar', 'baz'],
 			CookieGetter::fromEnv('TEST', ';'),
 		);
+
+		$_SERVER['DEBUG_COOKIE_VALUES'] = 'foo, bar,baz,';
+		self::assertSame(
+			['foo', 'bar', 'baz'],
+			CookieGetter::fromEnv(),
+		);
 	}
 
 }

@@ -178,6 +178,7 @@ List of cookie values can be easily obtained from an env variable
 
 - By default is expected env variable `DEBUG_COOKIE_VALUES` with values separated by a comma
 	- `DEBUG_COOKIE_VALUES = val1,val2`
+- Spaces around value and empty values are safely removed
 
 ```php
 use OriNette\DI\Boot\CookieGetter;

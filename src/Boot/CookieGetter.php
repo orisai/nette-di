@@ -2,6 +2,7 @@
 
 namespace OriNette\DI\Boot;
 
+use Nette\Utils\Strings;
 use function explode;
 
 final class CookieGetter
@@ -18,7 +19,26 @@ final class CookieGetter
 			return [];
 		}
 
-		return explode($valueSeparator, $_SERVER[$variableName]);
+		return self::filterEmpty(explode($valueSeparator, $_SERVER[$variableName]));
+	}
+
+	/**
+	 * @param array<string> $values
+	 * @return array<string>
+	 */
+	private static function filterEmpty(array $values): array
+	{
+		foreach ($values as $key => $value) {
+			$value = Strings::trim($value);
+
+			if ($value !== '') {
+				$values[$key] = $value;
+			} else {
+				unset($values[$key]);
+			}
+		}
+
+		return $values;
 	}
 
 }
