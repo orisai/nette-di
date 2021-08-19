@@ -2,28 +2,19 @@
 
 namespace OriNette\DI\Boot;
 
-use Orisai\Exceptions\Logic\InvalidArgument;
-use Orisai\Exceptions\Message;
 use function explode;
 
 final class CookieGetter
 {
 
 	/**
+	 * @param non-empty-string $variableName
+	 * @param non-empty-string $valueSeparator
 	 * @return array<string>
 	 */
-	public static function fromEnv(string $envVar = 'DEBUG_COOKIE_VALUES', string $valueSeparator = ','): array
+	public static function fromEnv(string $variableName = 'DEBUG_COOKIE_VALUES', string $valueSeparator = ','): array
 	{
-		if ($valueSeparator === '') {
-			$message = Message::create()
-				->withContext('Trying to set empty string as cookie value separator.')
-				->withProblem('Separator must be non-empty string.');
-
-			throw InvalidArgument::create()
-				->withMessage($message);
-		}
-
-		$var = $_SERVER[$envVar] ?? '';
+		$var = $_SERVER[$variableName] ?? '';
 
 		return explode($valueSeparator, $var);
 	}

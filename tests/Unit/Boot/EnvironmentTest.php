@@ -3,7 +3,6 @@
 namespace Tests\OriNette\DI\Unit\Boot;
 
 use OriNette\DI\Boot\Environment;
-use Orisai\Exceptions\Logic\InvalidArgument;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -115,17 +114,6 @@ final class EnvironmentTest extends TestCase
 			],
 			Environment::loadEnvParameters(''),
 		);
-	}
-
-	public function testEnvParametersBadDelimiter(): void
-	{
-		$this->expectException(InvalidArgument::class);
-		$this->expectExceptionMessage(<<<'MSG'
-Context: Trying to set empty string as env parameter delimiter.
-Problem: Delimiter must be non-empty string.
-MSG);
-
-		Environment::loadEnvParameters('', '');
 	}
 
 	public function testLocalhost(): void

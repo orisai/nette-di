@@ -2,8 +2,6 @@
 
 namespace OriNette\DI\Boot;
 
-use Orisai\Exceptions\Logic\InvalidArgument;
-use Orisai\Exceptions\Message;
 use function array_key_exists;
 use function array_shift;
 use function count;
@@ -18,6 +16,9 @@ use function substr;
 final class Environment
 {
 
+	/**
+	 * @param non-empty-string $variableName
+	 */
 	public static function isEnvDebugMode(string $variableName = 'ORISAI_DEBUG'): bool
 	{
 		$debug = $_SERVER[$variableName] ?? null;
@@ -28,19 +29,11 @@ final class Environment
 	/**
 	 * Collect environment parameters prefixed by $prefix
 	 *
+	 * @param non-empty-string $delimiter
 	 * @return array<mixed>
 	 */
 	public static function loadEnvParameters(string $prefix = 'ORISAI', string $delimiter = '__'): array
 	{
-		if ($delimiter === '') {
-			$message = Message::create()
-				->withContext('Trying to set empty string as env parameter delimiter.')
-				->withProblem('Delimiter must be non-empty string.');
-
-			throw InvalidArgument::create()
-				->withMessage($message);
-		}
-
 		if ($prefix !== '') {
 			$prefix .= $delimiter;
 		}
@@ -77,7 +70,8 @@ final class Environment
 	}
 
 	/**
-	 * @param array<string> $values
+	 * @param array<string>    $values
+	 * @param non-empty-string $cookieName
 	 */
 	public static function hasCookie(array $values, string $cookieName = 'orisai-debug'): bool
 	{
