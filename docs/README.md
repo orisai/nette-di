@@ -4,6 +4,7 @@ Configure your Orisai CMF/Nette application
 
 ## Content
 
+- [Setup](#setup)
 - [Configurator](#configurator)
 	- [Configuration](#configuration)
 	- [Debug mode](#debug-mode)
@@ -19,6 +20,14 @@ Configure your Orisai CMF/Nette application
 	- [Cache warmup](#cache-warmup)
 - [Definitions loader](#definitions-loader)
 - [Service manager](#service-manager)
+
+## Setup
+
+Install with [Composer](https://getcomposer.org)
+
+```sh
+composer require orisai/nette-di
+```
 
 ## Configurator
 
