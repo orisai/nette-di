@@ -17,7 +17,7 @@ abstract class ServiceManager
 	/** @var array<int|string, string> */
 	private array $serviceMap;
 
-	private Container $container;
+	protected Container $container;
 
 	/**
 	 * @param array<int|string, string> $serviceMap
