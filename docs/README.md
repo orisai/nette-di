@@ -132,13 +132,27 @@ use OriNette\DI\Boot\Environment;
 $configurator->setDebugMode(Environment::isLocalhost());
 ```
 
+#### In console
+
+```php
+use OriNette\DI\Boot\Environment;
+
+$configurator->setDebugMode(Environment::isConsole());
+```
+
+Preferably use [env variable](#with-env-variable) for your local console, otherwise debug mode will be enabled in
+console also on production.
+
 #### With env variable
 
 Useful for enabling debug mode in console
 
 Set env variable to `true` or `1`
 
-`ORISAI_DEBUG = true`
+```sh
+# Set env variable in console for current session
+export ORISAI_DEBUG=true
+```
 
 Check env variable in bootstrap
 

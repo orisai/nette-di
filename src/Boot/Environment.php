@@ -12,6 +12,7 @@ use function strlen;
 use function strpos;
 use function strtolower;
 use function substr;
+use const PHP_SAPI;
 
 final class Environment
 {
@@ -97,6 +98,11 @@ final class Environment
 		$address = $_SERVER['REMOTE_ADDR'] ?? php_uname('n');
 
 		return in_array($address, $list, true);
+	}
+
+	public static function isConsole(): bool
+	{
+		return PHP_SAPI === 'cli';
 	}
 
 }

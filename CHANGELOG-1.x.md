@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.0.1...HEAD)
 
+### Added
+
+- `Environment`
+	- `isConsole()`
+
 ## [1.0.1](https://github.com/orisai/nette-di/compare/1.0.0...1.0.1) - 2021-08-28
 
 ### Changed

@@ -4,6 +4,7 @@ namespace Tests\OriNette\DI\Unit\Boot;
 
 use OriNette\DI\Boot\Environment;
 use PHPUnit\Framework\TestCase;
+use const PHP_SAPI;
 
 /**
  * @runTestsInSeparateProcesses
@@ -191,6 +192,11 @@ final class EnvironmentTest extends TestCase
 		self::assertTrue(Environment::hasCookie([
 			'foo',
 		], 'another-debug'));
+	}
+
+	public function testConsole(): void
+	{
+		self::assertSame(PHP_SAPI === 'cli', Environment::isConsole());
 	}
 
 }
