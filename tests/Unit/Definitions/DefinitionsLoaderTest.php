@@ -27,7 +27,7 @@ final class DefinitionsLoaderTest extends TestCase
 
 		$this->rootDir = dirname(__DIR__, 3);
 		if (PHP_VERSION_ID < 81_000) {
-			@mkdir("$this->rootDir/var", 0_777, true);
+			@mkdir("$this->rootDir/var/build");
 		}
 	}
 
