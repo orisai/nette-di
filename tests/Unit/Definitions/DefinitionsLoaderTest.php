@@ -13,16 +13,31 @@ use Tests\OriNette\DI\Doubles\DefinitionsLoadingExtension;
 use Tests\OriNette\DI\Doubles\TestService;
 use function assert;
 use function dirname;
+use function mkdir;
+use const PHP_VERSION_ID;
 
 final class DefinitionsLoaderTest extends TestCase
 {
+
+	private string $rootDir;
+
+	protected function setUp(): void
+	{
+		parent::setUp();
+
+		$this->rootDir = dirname(__DIR__, 3);
+		if (PHP_VERSION_ID < 81_000) {
+			@mkdir("$this->rootDir/var", 0_777, true);
+		}
+	}
 
 	/**
 	 * @dataProvider resolvingProvider
 	 */
 	public function testResolving(bool $loadLater): void
 	{
-		$configurator = new ManualConfigurator(dirname(__DIR__, 3));
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 		$configurator->setDebugMode(true);
 		$configurator->addStaticParameters([
 			'__unique' => __METHOD__,
@@ -169,7 +184,8 @@ final class DefinitionsLoaderTest extends TestCase
 
 	public function testSelfReference(): void
 	{
-		$configurator = new ManualConfigurator(dirname(__DIR__, 3));
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 		$configurator->setDebugMode(true);
 		$configurator->addStaticParameters([
 			'__unique' => __METHOD__,

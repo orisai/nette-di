@@ -14,9 +14,18 @@ use function dirname;
 final class ServiceManagerTest extends TestCase
 {
 
+	private string $rootDir;
+
+	protected function setUp(): void
+	{
+		parent::setUp();
+
+		$this->rootDir = dirname(__DIR__, 3);
+	}
+
 	public function test(): void
 	{
-		$configurator = new ManualConfigurator(dirname(__DIR__, 3));
+		$configurator = new ManualConfigurator($this->rootDir);
 		$configurator->setDebugMode(true);
 		$configurator->addConfig(__DIR__ . '/serviceManager.neon');
 

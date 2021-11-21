@@ -15,6 +15,7 @@ Configure your Orisai CMF/Nette application
 		- [Dynamic parameters](#dynamic-parameters)
 		- [Predefined parameters](#predefined-parameters)
 		- [Load parameters from env variables](#load-parameters-from-env-variables)
+	- [Testing mode](#testing-mode)
 	- [Import services](#import-services)
 	- [Compilation](#compilation)
 	- [Cache warmup](#cache-warmup)
@@ -310,6 +311,17 @@ $configurator->addStaticParameters(Environment::loadEnvParameters('APP', ':'));
 
 This method uses `$_SERVER` instead of `getenv()` and so is safe to use under any conditions and is compatible with
 `.env` file libraries like [symfony/dotenv](https://github.com/symfony/dotenv).
+
+### Testing mode
+
+Generated container is cached on disk and does not reload unless one of dependencies changed and debug mode is enabled.
+While this makes sense during application runtime and development, it creates code coverage issues in automated tests.
+Compile-time code like compiler extensions is executed only once and second time tests are run, code is incorrectly
+reported as uncovered. This issue can be solved by always reloading container:
+
+```php
+$configurator->setForceReloadContainer();
+```
 
 ### Import services
 

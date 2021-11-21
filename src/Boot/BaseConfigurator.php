@@ -30,9 +30,11 @@ use function assert;
 use function class_exists;
 use function filemtime;
 use function is_array;
+use function is_file;
 use function is_subclass_of;
 use function method_exists;
 use function mkdir;
+use function unlink;
 use const DATE_ATOM;
 use const PHP_RELEASE_VERSION;
 use const PHP_SAPI;
@@ -66,6 +68,8 @@ abstract class BaseConfigurator
 
 	/** @var array<string, Adapter> */
 	protected array $configAdapters = [];
+
+	private bool $forceReloadContainer = false;
 
 	public function __construct(string $rootDir)
 	{
@@ -161,6 +165,13 @@ abstract class BaseConfigurator
 		return $this;
 	}
 
+	public function setForceReloadContainer(bool $force = true): self
+	{
+		$this->forceReloadContainer = $force;
+
+		return $this;
+	}
+
 	/**
 	 * @param array<string> $configFiles
 	 */
@@ -217,28 +228,33 @@ abstract class BaseConfigurator
 	{
 		$loader = new ContainerLoader(
 			/** @infection-ignore-all */
-			$this->staticParameters['buildDir'] . '/orisai.di.configurator',
+			$buildDir = $this->staticParameters['buildDir'] . '/orisai.di.configurator',
 			$this->staticParameters['debugMode'],
 		);
 
 		$configFiles = $this->loadConfigFiles();
 
+		/** @infection-ignore-all */
+		$containerKey = [
+			$this->staticParameters,
+			array_keys($this->dynamicParameters),
+			$configFiles,
+			PHP_VERSION_ID - PHP_RELEASE_VERSION,
+			class_exists(ClassLoader::class)
+				? filemtime(
+					(new ReflectionClass(ClassLoader::class))->getFileName(),
+				)
+				: null,
+		];
+
+		$this->forceReloadContainer
+		&& !class_exists($containerClass = $loader->getClassName($containerKey), false)
+		&& is_file($file = "$buildDir/$containerClass.php")
+		&& unlink($file);
+
 		$containerClass = $loader->load(
-			function (Compiler $compiler) use ($configFiles): void {
-				$this->generateContainer($compiler, $configFiles);
-			},
-			/** @infection-ignore-all */
-			[
-				$this->staticParameters,
-				array_keys($this->dynamicParameters),
-				$configFiles,
-				PHP_VERSION_ID - PHP_RELEASE_VERSION,
-				class_exists(ClassLoader::class)
-					? filemtime(
-						(new ReflectionClass(ClassLoader::class))->getFileName(),
-					)
-					: null,
-			],
+			fn (Compiler $compiler) => $this->generateContainer($compiler, $configFiles),
+			$containerKey,
 		);
 		assert(is_subclass_of($containerClass, Container::class));
 

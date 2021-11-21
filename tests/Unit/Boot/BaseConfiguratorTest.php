@@ -17,7 +17,9 @@ use Tracy\Debugger;
 use function class_exists;
 use function dirname;
 use function is_subclass_of;
+use function mkdir;
 use const PHP_SAPI;
+use const PHP_VERSION_ID;
 
 final class BaseConfiguratorTest extends TestCase
 {
@@ -29,6 +31,9 @@ final class BaseConfiguratorTest extends TestCase
 		parent::setUp();
 
 		$this->rootDir = dirname(__DIR__, 3);
+		if (PHP_VERSION_ID < 81_000) {
+			@mkdir("$this->rootDir/var", 0_777, true);
+		}
 	}
 
 	public function testCreateContainer(): void
@@ -42,9 +47,24 @@ final class BaseConfiguratorTest extends TestCase
 		$configurator->createContainer();
 	}
 
+	public function testForceReloadTwice(): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters([
+			'__unique' => __METHOD__,
+		]);
+
+		$class = $configurator->loadContainer();
+		self::assertFileExists("$this->rootDir/var/build/orisai.di.configurator/$class.php");
+		self::assertSame($class, $configurator->loadContainer());
+		self::assertFileExists("$this->rootDir/var/build/orisai.di.configurator/$class.php");
+	}
+
 	public function testDebugContainer(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 
 		$container1 = $configurator->loadContainer();
 		$container2 = $configurator->loadContainer();
@@ -59,6 +79,7 @@ final class BaseConfiguratorTest extends TestCase
 	{
 		$rootDir = $this->rootDir;
 		$configurator = new TestingConfigurator($rootDir);
+		$configurator->setForceReloadContainer();
 
 		self::assertSame(PHP_SAPI === 'cli', $configurator->isConsoleMode());
 
@@ -97,6 +118,7 @@ final class BaseConfiguratorTest extends TestCase
 	public function testParametersSpecificContainer(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 		$configurator->setDebugMode(true);
 
 		$basicContainer = $configurator->loadContainer();
@@ -122,6 +144,7 @@ final class BaseConfiguratorTest extends TestCase
 	public function testParametersEscaping(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 		$configurator->addStaticParameters([
 			'param1' => '%test%',
 			'param2' => '@test',
@@ -140,6 +163,7 @@ final class BaseConfiguratorTest extends TestCase
 	public function testDebuggerProduction(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 		$configurator->enableDebugger();
 
 		self::assertTrue(Debugger::$strictMode);
@@ -153,6 +177,7 @@ final class BaseConfiguratorTest extends TestCase
 	public function testDebuggerDebug(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 		$configurator->setDebugMode(true);
 		$configurator->enableDebugger();
 
@@ -164,6 +189,7 @@ final class BaseConfiguratorTest extends TestCase
 	public function testServices(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 		$configurator->addServices([
 			'service1' => ($service1 = new TestService()),
 			'service2' => ($service2 = new TestService()),
@@ -184,6 +210,7 @@ final class BaseConfiguratorTest extends TestCase
 	public function testExtensions(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 		$configurator->addStaticParameters(['__unique' => __METHOD__]);
 		$configurator->addConfig(__DIR__ . '/extensions.neon');
 		$configurator->onCompile[] = static function (Compiler $compiler): void {
@@ -200,6 +227,7 @@ final class BaseConfiguratorTest extends TestCase
 	public function testConfigFileSpecificContainer(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 		$containerBase = $configurator->loadContainer();
 
 		$configurator->addConfig(__DIR__ . '/extensions.neon');
@@ -214,6 +242,7 @@ final class BaseConfiguratorTest extends TestCase
 	public function testAutowireExcluded(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 		$configurator->addConfig(__DIR__ . '/autowire-excluded.neon');
 		$container = $configurator->createContainer();
 
@@ -226,6 +255,7 @@ final class BaseConfiguratorTest extends TestCase
 	public function testOnCompile(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 		$configurator->addStaticParameters(['__unique' => __METHOD__]);
 		$configurator->onCompile[] = static function (Compiler $compiler): void {
 			$compiler->addConfig(['parameters' => ['test' => 'test']]);
@@ -238,6 +268,7 @@ final class BaseConfiguratorTest extends TestCase
 	public function testPriority(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 		$configurator->addStaticParameters(['__unique' => __METHOD__]);
 
 		$configurator->addConfig(__DIR__ . '/priority-parameters.neon');
@@ -267,6 +298,7 @@ final class BaseConfiguratorTest extends TestCase
 	public function testTracyOptional(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
 
 		DependenciesTester::addIgnoredPackages(['tracy/tracy']);
 

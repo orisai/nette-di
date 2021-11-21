@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.0.2...HEAD)
 
+### Added
+
+- `BaseConfigurator`
+  - `setForceReloadContainer()`
+
 ## [1.0.2](https://github.com/orisai/nette-di/compare/1.0.1...1.0.2) - 2021-06-11
 
 ### Added
