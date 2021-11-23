@@ -6,6 +6,8 @@ services:
 
 	referencedClass: Tests\OriNette\DI\Doubles\AnotherTestService
 
+	ctorArgument: stdClass
+
 loader:
 	definitions:
 		string: Tests\OriNette\DI\Doubles\TestService
@@ -14,6 +16,8 @@ loader:
 		referenceClass: @Tests\OriNette\DI\Doubles\AnotherTestService
 		array:
 			factory: Tests\OriNette\DI\Doubles\TestService
+			arguments:
+				ctorArgument: @ctorArgument
 			setup:
 				- addParams('%%message%%')
 		arrayWithAutowiringSet:

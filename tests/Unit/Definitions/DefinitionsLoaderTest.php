@@ -7,6 +7,7 @@ use Nette\DI\Compiler;
 use OriNette\DI\Boot\ManualConfigurator;
 use Orisai\Exceptions\Logic\InvalidArgument;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Tests\OriNette\DI\Doubles\AnotherTestService;
 use Tests\OriNette\DI\Doubles\DefinitionsList;
 use Tests\OriNette\DI\Doubles\DefinitionsLoadingExtension;
@@ -77,6 +78,7 @@ final class DefinitionsLoaderTest extends TestCase
 
 		$arrayService = $container->getService('loader.definition.array');
 		self::assertInstanceOf(TestService::class, $arrayService);
+		self::assertInstanceOf(stdClass::class, $arrayService->getCtorArgument());
 
 		$arrayWithAutowiringService = $container->getService('loader.definition.arrayWithAutowiringSet');
 		self::assertInstanceOf(TestService::class, $arrayWithAutowiringService);

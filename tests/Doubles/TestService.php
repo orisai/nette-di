@@ -2,11 +2,20 @@
 
 namespace Tests\OriNette\DI\Doubles;
 
+use stdClass;
+
 final class TestService
 {
 
 	/** @var array<mixed> */
 	private array $params = [];
+
+	private ?stdClass $ctorArgument;
+
+	public function __construct(?stdClass $ctorArgument = null)
+	{
+		$this->ctorArgument = $ctorArgument;
+	}
 
 	/**
 	 * @param mixed ...$params
@@ -22,6 +31,11 @@ final class TestService
 	public function getParams(): array
 	{
 		return $this->params;
+	}
+
+	public function getCtorArgument(): ?stdClass
+	{
+		return $this->ctorArgument;
 	}
 
 }

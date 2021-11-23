@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.0.3...HEAD)
 
+### Fixed
+
+- `DefinitionsLoader`
+	- Service `@reference` in definition arguments
+
 ## [1.0.3](https://github.com/orisai/nette-di/compare/1.0.2...1.0.3) - 2021-11-21
 
 ### Added

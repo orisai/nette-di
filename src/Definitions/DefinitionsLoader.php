@@ -14,7 +14,6 @@ use function array_key_exists;
 use function class_exists;
 use function is_array;
 use function is_string;
-use function preg_replace;
 use function str_replace;
 use function substr;
 
@@ -111,7 +110,7 @@ final class DefinitionsLoader
 		}
 
 		if (is_string($value)) {
-			return preg_replace(['/@/', '/%/'], ['@@', '%%'], $value);
+			return str_replace('%', '%%', $value);
 		}
 
 		return $value;
