@@ -9,7 +9,7 @@ use function explode;
 use function in_array;
 use function php_uname;
 use function strlen;
-use function strpos;
+use function strncmp;
 use function strtolower;
 use function substr;
 use const PHP_SAPI;
@@ -28,10 +28,11 @@ final class Environment
 	}
 
 	/**
-	 * Collect environment parameters prefixed by $prefix
+	 * Parse environment variables prefixed by $prefix via splitting parts by $delimiter
+	 * {$prefix}{$delimiter}{NAME-1}({$delimiter}{NAME-n})
 	 *
 	 * @param non-empty-string $delimiter
-	 * @return array<mixed>
+	 * @return array<int|string, mixed>
 	 */
 	public static function loadEnvParameters(string $prefix = 'ORISAI', string $delimiter = '__'): array
 	{
@@ -39,35 +40,44 @@ final class Environment
 			$prefix .= $delimiter;
 		}
 
-		$map = static function (array &$array, array $keys, $value) use (&$map) {
-			if (count($keys) <= 0) {
-				return $value;
-			}
-
-			$key = array_shift($keys);
-
-			if (!array_key_exists($key, $array)) {
-				$array[$key] = [];
-			}
-
-			// Recursive
-			$array[$key] = $map($array[$key], $keys, $value);
-
-			return $array;
-		};
-
 		$parameters = [];
-
+		$prefixLength = strlen($prefix);
 		foreach ($_SERVER as $key => $value) {
-			if ($prefix === '' || strpos($key, $prefix) === 0) {
-				// Parse PREFIX{delimiter}{NAME-1}{delimiter}{NAME-N}
-				$keys = explode($delimiter, strtolower(substr($key, strlen($prefix))));
-				// Make array structure
-				$map($parameters, $keys, $value);
+			if ($prefix !== '' && strncmp($key, $prefix, $prefixLength) !== 0) {
+				continue;
 			}
+
+			self::mapParameters(
+				$parameters,
+				explode($delimiter, strtolower(substr($key, $prefixLength))),
+				$value,
+			);
 		}
 
 		return $parameters;
+	}
+
+	/**
+	 * @param array<int|string, mixed> $array
+	 * @param array<int, string>       $keys
+	 * @param mixed                    $value
+	 * @return mixed
+	 */
+	private static function mapParameters(array &$array, array $keys, $value)
+	{
+		if (count($keys) <= 0) {
+			return $value;
+		}
+
+		$key = array_shift($keys);
+
+		if (!array_key_exists($key, $array)) {
+			$array[$key] = [];
+		}
+
+		$array[$key] = self::mapParameters($array[$key], $keys, $value);
+
+		return $array;
 	}
 
 	/**
