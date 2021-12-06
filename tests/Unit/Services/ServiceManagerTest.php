@@ -10,6 +10,8 @@ use stdClass;
 use Tests\OriNette\DI\Doubles\TestingServiceManager;
 use Tests\OriNette\DI\Doubles\TestService;
 use function dirname;
+use function mkdir;
+use const PHP_VERSION_ID;
 
 final class ServiceManagerTest extends TestCase
 {
@@ -21,6 +23,9 @@ final class ServiceManagerTest extends TestCase
 		parent::setUp();
 
 		$this->rootDir = dirname(__DIR__, 3);
+		if (PHP_VERSION_ID < 8_01_00) {
+			@mkdir("$this->rootDir/var/build");
+		}
 	}
 
 	public function test(): void
