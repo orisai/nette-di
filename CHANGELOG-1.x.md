@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.0.4...HEAD)
 
+### Added
+
+- Stub file with `BaseConfigurator` parameters for IDE neon support
+
 ## [1.0.4](https://github.com/orisai/nette-di/compare/1.0.3...1.0.4) - 2021-11-23
 
 ### Fixed

@@ -1,0 +1,14 @@
+# Stub file for IDE neon support
+parameters:
+
+	# BaseConfigurator parameters
+	rootDir: ''
+	appDir: %rootDir%/src
+	buildDir: %rootDir%/var/build
+	dataDir: %rootDir%/data
+	logDir: %rootDir%/var/log
+	tempDir: %rootDir%/var/cache
+	vendorDir: %rootDir%/vendor
+	wwwDir: %rootDir%/public
+	debugMode: false
+	consoleMode: false
