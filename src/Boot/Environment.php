@@ -32,7 +32,7 @@ final class Environment
 	 * {$prefix}{$delimiter}{NAME-1}({$delimiter}{NAME-n})
 	 *
 	 * @param non-empty-string $delimiter
-	 * @return array<int|string, mixed>
+	 * @return array<string, mixed>
 	 */
 	public static function loadEnvParameters(string $prefix = 'ORISAI', string $delimiter = '__'): array
 	{
@@ -58,9 +58,9 @@ final class Environment
 	}
 
 	/**
-	 * @param array<int|string, mixed> $array
-	 * @param array<int, string>       $keys
-	 * @param mixed                    $value
+	 * @param array<string, mixed> $array
+	 * @param array<int, string>   $keys
+	 * @param mixed                $value
 	 * @return mixed
 	 */
 	private static function mapParameters(array &$array, array $keys, $value)

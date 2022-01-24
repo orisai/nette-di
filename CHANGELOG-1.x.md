@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.0.5...HEAD)
 
+### Fixed
+
+- `Environment`: `loadEnvParameters()` return type
+
 ## [1.0.5](https://github.com/orisai/nette-di/compare/1.0.4...1.0.5) - 2022-01-16
 
 ### Added
