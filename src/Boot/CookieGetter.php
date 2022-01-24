@@ -11,7 +11,7 @@ final class CookieGetter
 	/**
 	 * @param non-empty-string $variableName
 	 * @param non-empty-string $valueSeparator
-	 * @return array<string>
+	 * @return array<int|string, string>
 	 */
 	public static function fromEnv(string $variableName = 'DEBUG_COOKIE_VALUES', string $valueSeparator = ','): array
 	{
@@ -23,8 +23,8 @@ final class CookieGetter
 	}
 
 	/**
-	 * @param array<string> $values
-	 * @return array<string>
+	 * @param array<int|string, string> $values
+	 * @return array<int|string, string>
 	 */
 	private static function filterEmpty(array $values): array
 	{

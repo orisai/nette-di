@@ -81,7 +81,7 @@ final class Environment
 	}
 
 	/**
-	 * @param array<string>    $values
+	 * @param array<int|string, string>    $values
 	 * @param non-empty-string $cookieName
 	 */
 	public static function hasCookie(array $values, string $cookieName = 'orisai-debug'): bool

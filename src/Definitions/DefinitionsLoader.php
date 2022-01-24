@@ -37,7 +37,7 @@ final class DefinitionsLoader
 	}
 
 	/**
-	 * @param string|array<mixed>|Statement $config
+	 * @param string|array<int|string, mixed>|Statement $config
 	 * @return Definition|Reference
 	 */
 	public function loadDefinitionFromConfig($config, string $prefix)

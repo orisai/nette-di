@@ -7,7 +7,7 @@ use Nette\DI\Config\Adapter;
 final class ManualConfigurator extends BaseConfigurator
 {
 
-	/** @var array<string> */
+	/** @var array<int|string, string> */
 	private array $configs = [];
 
 	public function addConfig(string $configFile): void
@@ -21,7 +21,7 @@ final class ManualConfigurator extends BaseConfigurator
 	}
 
 	/**
-	 * @return array<string>
+	 * {@inheritDoc}
 	 */
 	protected function loadConfigFiles(): array
 	{

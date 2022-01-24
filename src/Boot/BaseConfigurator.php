@@ -49,12 +49,12 @@ abstract class BaseConfigurator
 	protected string $rootDir;
 
 	/**
-	 * @var array<Closure>
-	 * @phpstan-var array<Closure(Compiler $compiler): void>
+	 * @var array<int|string, Closure>
+	 * @phpstan-var array<int|string, Closure(Compiler $compiler): void>
 	 */
 	public array $onCompile = [];
 
-	/** @var array<class-string> */
+	/** @var array<int|string, class-string> */
 	public array $autowireExcludedClasses = [ArrayAccess::class, Countable::class, IteratorAggregate::class, stdClass::class, Traversable::class];
 
 	/** @var array<string, mixed> */
@@ -78,7 +78,7 @@ abstract class BaseConfigurator
 	}
 
 	/**
-	 * @return array<mixed>
+	 * @return array<string, mixed>
 	 */
 	protected function getDefaultParameters(): array
 	{
@@ -173,7 +173,7 @@ abstract class BaseConfigurator
 	}
 
 	/**
-	 * @param array<string> $configFiles
+	 * @param array<int|string, string> $configFiles
 	 */
 	private function generateContainer(Compiler $compiler, array $configFiles): void
 	{
@@ -217,7 +217,7 @@ abstract class BaseConfigurator
 	}
 
 	/**
-	 * @return array<string>
+	 * @return array<int|string, string>
 	 */
 	abstract protected function loadConfigFiles(): array;
 

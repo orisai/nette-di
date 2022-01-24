@@ -8,7 +8,7 @@ final class TestingConfigurator extends BaseConfigurator
 {
 
 	/**
-	 * @return array<mixed>
+	 * {@inheritDoc}
 	 */
 	public function getDefaultParameters(): array
 	{
@@ -16,7 +16,7 @@ final class TestingConfigurator extends BaseConfigurator
 	}
 
 	/**
-	 * @return array<string>
+	 * {@inheritDoc}
 	 */
 	protected function loadConfigFiles(): array
 	{

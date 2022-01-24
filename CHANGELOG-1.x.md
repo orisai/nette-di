@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.0.5...HEAD)
 
+### Added
+
+- All arrays have a key type defined
+
 ### Fixed
 
 - `Environment`: `loadEnvParameters()` return type
