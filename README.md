@@ -1,4 +1,8 @@
-<h1 align="center">Orisai Nette DI</h1>
+<h1 align="center">
+	<img src="https://github.com/orisai/.github/blob/main/images/repo_title.png" alt="Orisai"/>
+	<br/>
+	Nette DI
+</h1>
 
 <p align="center">
     Configure your Orisai CMF/Nette application
