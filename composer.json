@@ -1,6 +1,6 @@
 {
 	"name": "orisai/nette-di",
-	"description": "Configure your Orisai CMF/Nette application",
+	"description": "Configure your Nette application",
 	"keywords": [
 		"bootstrap",
 		"configuration",

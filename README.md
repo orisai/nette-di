@@ -5,7 +5,7 @@
 </h1>
 
 <p align="center">
-    Configure your Orisai CMF/Nette application
+    Configure your Nette application
 </p>
 
 <p align=center>
