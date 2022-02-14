@@ -4,3 +4,6 @@ includes:
 parameters:
 	level: 3
 	resultCachePath: %currentWorkingDirectory%/var/tools/PHPStan/resultCache.tests.php
+
+	scanDirectories:
+		- ../src
