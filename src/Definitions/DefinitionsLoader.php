@@ -6,8 +6,8 @@ use Nette\DI\Compiler;
 use Nette\DI\Definitions\Definition;
 use Nette\DI\Definitions\Reference;
 use Nette\DI\Definitions\Statement;
+use Nette\Schema\Elements\AnyOf;
 use Nette\Schema\Expect;
-use Nette\Schema\Schema;
 use Nette\Utils\Strings;
 use Orisai\Exceptions\Logic\InvalidArgument;
 use function array_key_exists;
@@ -27,7 +27,7 @@ final class DefinitionsLoader
 		$this->compiler = $compiler;
 	}
 
-	public static function schema(): Schema
+	public static function schema(): AnyOf
 	{
 		return Expect::anyOf(
 			Expect::string(),
