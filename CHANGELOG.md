@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 
 - `DefinitionsLoader`
-	- `schema()` - more accurate return type
+    - `schema()` - more accurate return type
+    - `loadDefinitionFromConfig()` returns `Definition` for `@reference::method` instead of `Reference`
 
 ## [1.0.6](https://github.com/orisai/nette-di/compare/1.0.5...1.0.6) - 2022-01-24
 

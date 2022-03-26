@@ -45,7 +45,7 @@ final class DefinitionsLoader
 		$builder = $this->compiler->getContainerBuilder();
 
 		// Definition is defined by external source (e.g. ServicesExtension), try to get it
-		if (is_string($config) && Strings::startsWith($config, '@')) {
+		if (is_string($config) && Strings::startsWith($config, '@') && !Strings::contains($config, '::')) {
 			$definitionName = substr($config, 1);
 
 			if ($definitionName === Reference::SELF) {
