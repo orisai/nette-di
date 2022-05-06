@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.0.7...HEAD)
 
+### Fixed
+
+- Stub file
+  - Add missing `container` parameter
+
 ## [1.0.7](https://github.com/orisai/nette-di/compare/1.0.6...1.0.7) - 2022-03-26
 
 ### Fixed
