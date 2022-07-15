@@ -211,8 +211,8 @@ abstract class BaseConfigurator
 
 	private function onCompile(Compiler $compiler): void
 	{
-		foreach ($this->onCompile as $event) {
-			$event($compiler);
+		foreach ($this->onCompile as $cb) {
+			$cb($compiler);
 		}
 	}
 
@@ -227,8 +227,11 @@ abstract class BaseConfigurator
 	public function loadContainer(): string
 	{
 		/** @infection-ignore-all */
+		$buildDir = $this->staticParameters['buildDir'] . '/orisai.di.configurator';
+
+		/** @infection-ignore-all */
 		$loader = new ContainerLoader(
-			$buildDir = $this->staticParameters['buildDir'] . '/orisai.di.configurator',
+			$buildDir,
 			$this->staticParameters['debugMode'],
 		);
 
