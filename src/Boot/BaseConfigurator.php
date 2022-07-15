@@ -235,10 +235,7 @@ abstract class BaseConfigurator
 		$configFiles = $this->loadConfigFiles();
 		$containerKey = $this->getContainerKey($configFiles);
 
-		$this->forceReloadContainer
-		&& !class_exists($containerClass = $loader->getClassName($containerKey), false)
-		&& is_file($file = "$buildDir/$containerClass.php")
-		&& unlink($file);
+		$this->reloadContainerOnDemand($loader, $containerKey, $buildDir);
 
 		$containerClass = $loader->load(
 			fn (Compiler $compiler) => $this->generateContainer($compiler, $configFiles),
@@ -282,6 +279,17 @@ abstract class BaseConfigurator
 				)
 				: null,
 		];
+	}
+
+	/**
+	 * @param array<int|string, mixed> $containerKey
+	 */
+	private function reloadContainerOnDemand(ContainerLoader $loader, array $containerKey, string $buildDir): void
+	{
+		$this->forceReloadContainer
+		&& !class_exists($containerClass = $loader->getClassName($containerKey), false)
+		&& is_file($file = "$buildDir/$containerClass.php")
+		&& unlink($file);
 	}
 
 }
