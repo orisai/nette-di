@@ -226,26 +226,14 @@ abstract class BaseConfigurator
 	 */
 	public function loadContainer(): string
 	{
+		/** @infection-ignore-all */
 		$loader = new ContainerLoader(
-			/** @infection-ignore-all */
 			$buildDir = $this->staticParameters['buildDir'] . '/orisai.di.configurator',
 			$this->staticParameters['debugMode'],
 		);
 
 		$configFiles = $this->loadConfigFiles();
-
-		/** @infection-ignore-all */
-		$containerKey = [
-			$this->staticParameters,
-			array_keys($this->dynamicParameters),
-			$configFiles,
-			PHP_VERSION_ID - PHP_RELEASE_VERSION,
-			class_exists(ClassLoader::class)
-				? filemtime(
-					(new ReflectionClass(ClassLoader::class))->getFileName(),
-				)
-				: null,
-		];
+		$containerKey = $this->getContainerKey($configFiles);
 
 		$this->forceReloadContainer
 		&& !class_exists($containerClass = $loader->getClassName($containerKey), false)
@@ -274,6 +262,26 @@ abstract class BaseConfigurator
 		$container->initialize();
 
 		return $container;
+	}
+
+	/**
+	 * @param array<int|string, string> $configFiles
+	 * @return array<int|string, mixed>
+	 */
+	private function getContainerKey(array $configFiles): array
+	{
+		/** @infection-ignore-all */
+		return [
+			$this->staticParameters,
+			array_keys($this->dynamicParameters),
+			$configFiles,
+			PHP_VERSION_ID - PHP_RELEASE_VERSION,
+			class_exists(ClassLoader::class)
+				? filemtime(
+					(new ReflectionClass(ClassLoader::class))->getFileName(),
+				)
+				: null,
+		];
 	}
 
 }
