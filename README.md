@@ -38,3 +38,33 @@
 <p>
 
 ##
+
+```php
+namespace App;
+
+use OriNette\DI\Boot\Environment;
+use OriNette\DI\Boot\ManualConfigurator;
+
+final class Bootstrap
+{
+
+	public static function boot(): ManualConfigurator
+	{
+		$configurator = new ManualConfigurator(dirname(__DIR__));
+
+		$configurator->setDebugMode(
+			Environment::isEnvDebugMode()
+			|| Environment::isLocalhost()
+		);
+		$configurator->enableDebugger();
+
+		$configurator->addConfig(__DIR__ . '/wiring.neon');
+		$configurator->addConfig(__DIR__ . '/../config/local.neon');
+
+		return $configurator;
+	}
+
+}
+```
+
+... and [more](docs/README.md).
