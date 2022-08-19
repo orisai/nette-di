@@ -40,18 +40,18 @@ An alternative for [nette/bootstrap](https://github.com/nette/bootstrap)
 To use it, create bootstrap class where you preconfigure your application
 
 ```php
-namespace App\Boot;
+namespace App;
 
 use OriNette\DI\Boot\Environment;
 use OriNette\DI\Boot\ManualConfigurator;
+use function dirname;
 
 final class Bootstrap
 {
 
 	public static function boot(): ManualConfigurator
 	{
-		$rootDir = dirname(__DIR__, 2);
-		$configurator = new ManualConfigurator($rootDir);
+		$configurator = new ManualConfigurator(dirname(__DIR__));
 
 		$configurator->addStaticParameters(Environment::loadEnvParameters());
 
@@ -62,8 +62,8 @@ final class Bootstrap
 		);
 		$configurator->enableDebugger();
 
-		$configurator->addConfig(__DIR__ . '/../config/common.neon');
-		$configurator->addConfig(__DIR__ . '/../config/server/local.neon');
+		$configurator->addConfig(__DIR__ . '/wiring.neon');
+		$configurator->addConfig(__DIR__ . '/../config/local.neon');
 
 		return $configurator;
 	}
@@ -82,7 +82,7 @@ final class Bootstrap
 In application entrypoint (`index.php`) - get the configurator, create a container, get the application and run it.
 
 ```php
-use App\Boot\Bootstrap;
+use App\Bootstrap;
 use Nette\Application\Application;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -98,7 +98,7 @@ Bootstrap::boot()
 Add config files
 
 ```php
-$configurator->addConfig(__DIR__ . '/../config/common.neon');
+$configurator->addConfig(__DIR__ . '/../config/local.neon');
 ```
 
 By default, `neon` and `php` files supported. For other formats, add an own adapter:
