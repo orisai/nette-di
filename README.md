@@ -53,7 +53,7 @@ final class Bootstrap
 		$configurator = new ManualConfigurator(dirname(__DIR__));
 
 		$configurator->setDebugMode(
-			Environment::isEnvDebugMode()
+			Environment::isEnvDebug()
 			|| Environment::isLocalhost()
 		);
 		$configurator->enableDebugger();

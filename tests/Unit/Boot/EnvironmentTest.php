@@ -15,22 +15,23 @@ final class EnvironmentTest extends TestCase
 	public function testEnvDebugMode(): void
 	{
 		unset($_SERVER['ORISAI_DEBUG']);
+		self::assertFalse(Environment::isEnvDebug());
 		self::assertFalse(Environment::isEnvDebugMode());
 
 		$_SERVER['ORISAI_DEBUG'] = 'anything';
-		self::assertFalse(Environment::isEnvDebugMode());
+		self::assertFalse(Environment::isEnvDebug());
 
 		$_SERVER['ORISAI_DEBUG'] = '1';
-		self::assertTrue(Environment::isEnvDebugMode());
+		self::assertTrue(Environment::isEnvDebug());
 
 		$_SERVER['ORISAI_DEBUG'] = 'true';
-		self::assertTrue(Environment::isEnvDebugMode());
+		self::assertTrue(Environment::isEnvDebug());
 
 		$_SERVER['ORISAI_DEBUG'] = 'TRUE';
-		self::assertTrue(Environment::isEnvDebugMode());
+		self::assertTrue(Environment::isEnvDebug());
 
 		$_SERVER['ORISAI_DEBUG'] = 'tRuE';
-		self::assertTrue(Environment::isEnvDebugMode());
+		self::assertTrue(Environment::isEnvDebug());
 	}
 
 	public function testEnvParameters(): void

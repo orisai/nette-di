@@ -7,3 +7,6 @@ parameters:
 
 	scanDirectories:
 		- ../src
+
+	ignoreErrors:
+		- '#^Call to deprecated method isEnvDebugMode\(\) of class OriNette\\DI\\Boot\\Environment(.+)#'

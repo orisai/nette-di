@@ -20,11 +20,22 @@ final class Environment
 	/**
 	 * @param non-empty-string $variableName
 	 */
-	public static function isEnvDebugMode(string $variableName = 'ORISAI_DEBUG'): bool
+	public static function isEnvDebug(string $variableName = 'ORISAI_DEBUG'): bool
 	{
 		$debug = $_SERVER[$variableName] ?? null;
 
 		return $debug !== null && (strtolower($debug) === 'true' || $debug === '1');
+	}
+
+	/**
+	 * @param non-empty-string $variableName
+	 *
+	 * @deprecated Use isEnvDebug() instead
+	 * @see self::isEnvDebug()
+	 */
+	public static function isEnvDebugMode(string $variableName = 'ORISAI_DEBUG'): bool
+	{
+		return self::isEnvDebug($variableName);
 	}
 
 	/**

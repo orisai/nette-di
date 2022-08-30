@@ -56,7 +56,7 @@ final class Bootstrap
 		$configurator->addStaticParameters(Environment::loadEnvParameters());
 
 		$configurator->setDebugMode(
-			Environment::isEnvDebugMode()
+			Environment::isEnvDebug()
 			|| Environment::isLocalhost()
 			|| Environment::hasCookie(self::getDebugCookieValues()),
 		);
@@ -160,7 +160,7 @@ Check env variable in bootstrap
 ```php
 use OriNette\DI\Boot\Environment;
 
-$configurator->setDebugMode(Environment::isEnvDebugMode());
+$configurator->setDebugMode(Environment::isEnvDebug());
 ```
 
 We can also change the variable name to something else
@@ -168,7 +168,7 @@ We can also change the variable name to something else
 ```php
 use OriNette\DI\Boot\Environment;
 
-Environment::isEnvDebugMode('VARIABLE_NAME');
+Environment::isEnvDebug('VARIABLE_NAME');
 ```
 
 #### With cookie

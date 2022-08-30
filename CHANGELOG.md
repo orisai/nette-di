@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.0.8...HEAD)
 
+### Changed
+
+- `Environment`
+  - `isEnvDebugMode()` is deprecated, use `isEnvDebug()` instead
+
 ## [1.0.8](https://github.com/orisai/nette-di/compare/1.0.7...1.0.8) - 2022-05-06
 
 ### Fixed
