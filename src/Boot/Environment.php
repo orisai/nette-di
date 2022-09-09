@@ -6,6 +6,7 @@ use function array_key_exists;
 use function array_shift;
 use function count;
 use function explode;
+use function getenv;
 use function in_array;
 use function php_uname;
 use function strlen;
@@ -25,9 +26,9 @@ final class Environment
 	 */
 	public static function isEnvDebug(string $variableName = 'ORISAI_DEBUG'): bool
 	{
-		$debug = $_SERVER[$variableName] ?? null;
+		$debug = $_SERVER[$variableName] ?? getenv($variableName);
 
-		return $debug !== null && (strtolower($debug) === 'true' || $debug === '1');
+		return $debug !== false && (strtolower($debug) === 'true' || $debug === '1');
 	}
 
 	/**
@@ -56,7 +57,7 @@ final class Environment
 
 		$parameters = [];
 		$prefixLength = strlen($prefix);
-		foreach ($_SERVER as $key => $value) {
+		foreach ($_SERVER + getenv() as $key => $value) {
 			if ($prefix !== '' && strncmp($key, $prefix, $prefixLength) !== 0) {
 				continue;
 			}

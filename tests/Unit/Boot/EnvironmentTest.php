@@ -6,6 +6,7 @@ use OriNette\DI\Boot\Environment;
 use OriNette\DI\Boot\FileDebugCookieStorage;
 use Orisai\VFS\VFS;
 use PHPUnit\Framework\TestCase;
+use function putenv;
 use const PHP_SAPI;
 
 /**
@@ -17,6 +18,7 @@ final class EnvironmentTest extends TestCase
 	public function testEnvDebugMode(): void
 	{
 		unset($_SERVER['ORISAI_DEBUG']);
+		putenv('ORISAI_DEBUG=false');
 		self::assertFalse(Environment::isEnvDebug());
 		self::assertFalse(Environment::isEnvDebugMode());
 
@@ -34,6 +36,19 @@ final class EnvironmentTest extends TestCase
 
 		$_SERVER['ORISAI_DEBUG'] = 'tRuE';
 		self::assertTrue(Environment::isEnvDebug());
+	}
+
+	public function testEnvDebugModeGetEnvFallback(): void
+	{
+		unset($_SERVER['ORISAI_DEBUG']);
+		putenv('ORISAI_DEBUG=false');
+		self::assertFalse(Environment::isEnvDebug());
+
+		putenv('ORISAI_DEBUG=true');
+		self::assertTrue(Environment::isEnvDebug());
+
+		$_SERVER['ORISAI_DEBUG'] = 'false';
+		self::assertFalse(Environment::isEnvDebug());
 	}
 
 	public function testEnvParameters(): void
@@ -109,14 +124,38 @@ final class EnvironmentTest extends TestCase
 			'ANOTHER__KEY' => 'another.key',
 		];
 
+		$parameters = Environment::loadEnvParameters('');
+
+		self::assertSame($parameters['key'], 'key');
+		self::assertSame($parameters['another'], ['key' => 'another.key']);
+	}
+
+	public function testEnvParametersGetEnvFallback(): void
+	{
+		$_SERVER = [];
+		putenv('ORISAI__B=getenv');
+		putenv('ORISAI__C=getenv');
+
 		self::assertSame(
 			[
-				'key' => 'key',
-				'another' => [
-					'key' => 'another.key',
-				],
+				'b' => 'getenv',
+				'c' => 'getenv',
 			],
-			Environment::loadEnvParameters(''),
+			Environment::loadEnvParameters(),
+		);
+
+		$_SERVER = [
+			'ORISAI__A' => 'server',
+			'ORISAI__B' => 'server',
+		];
+
+		self::assertSame(
+			[
+				'a' => 'server',
+				'b' => 'server',
+				'c' => 'getenv',
+			],
+			Environment::loadEnvParameters(),
 		);
 	}
 

@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
     - `FileDebugCookieStorage`
   - `CookieDebugSwitcher`
 
+- `getenv()` as a fallback to `$_SERVER` in:
+  - `Environment::isEnvDebug()`
+  - `Environment::loadEnvParameters()`
+
 ### Changed
 
 - `Environment`
