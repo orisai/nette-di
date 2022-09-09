@@ -17,9 +17,8 @@ use const PHP_SAPI;
 final class Environment
 {
 
-	private const SessCookie = 'ORISAI_SID',
-		SessKey = 'orisai-debug',
-		SessValue = true;
+	/** @internal */
+	public const SidDebugCookie = 'orisai-debug-sid';
 
 	/**
 	 * @param non-empty-string $variableName
@@ -130,92 +129,15 @@ final class Environment
 		return PHP_SAPI === 'cli';
 	}
 
-	public static function isSessionDebug(): bool
+	public static function isCookieDebug(DebugCookieStorage $storage): bool
 	{
-		if (!isset($_COOKIE[self::SessCookie])) {
+		$value = $_COOKIE[self::SidDebugCookie] ?? null;
+
+		if ($value === null) {
 			return false;
 		}
 
-		$realSession = self::stopRealSession();
-
-		self::startDebugSession();
-		$value = $_SESSION[self::SessKey];
-		self::stopDebugSession();
-
-		if ($realSession !== null) {
-			self::startRealSession($realSession);
-		}
-
-		return $value === self::SessValue;
-	}
-
-	public static function startSessionDebug(): void
-	{
-		$realSession = self::stopRealSession();
-
-		self::startDebugSession();
-		$_SESSION[self::SessKey] = self::SessValue;
-		self::stopDebugSession();
-
-		if ($realSession !== null) {
-			self::startRealSession($realSession);
-		}
-	}
-
-	public static function stopSessionDebug(): void
-	{
-		if (!isset($_COOKIE[self::SessCookie])) {
-			return;
-		}
-
-		// TODO - options
-		/* @see self::startDebugSession() */
-		setcookie(self::SessCookie, '', [
-			'expires' => 0,
-			'path' => '/', //TODO - basepath
-			'domain' => '', //TODO - ???
-			'secure' => false, //TODO - auto? proxy requires configuration
-			'httponly' => true,
-			'samesite' => 'Lax',
-		]);
-	}
-
-	/**
-	 * @return array<mixed>|null
-	 */
-	private static function stopRealSession(): ?array
-	{
-		if (session_status() !== PHP_SESSION_ACTIVE) {
-			return null;
-		}
-
-		session_write_close();
-
-		// TODO - return session options
-
-		return [];
-	}
-
-	/**
-	 * @param array<mixed> $options
-	 */
-	private static function startRealSession(array $options): void
-	{
-		session_start($options);
-	}
-
-	private static function stopDebugSession(): void
-	{
-		session_write_close();
-	}
-
-	private static function startDebugSession(): void
-	{
-		//TODO - start with correct options (including cookie options)
-		/* @see self::stopDebugSession() */
-		session_start([
-
-		]);
+		return $storage->has($value);
 	}
 
 }

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.0.8...HEAD)
 
+### Added
+
+- Runtime cookie debug switch
+  - `Environment::isCookieDebug()`
+  - `DebugCookieStorage` interface
+    - `FileDebugCookieStorage`
+  - `CookieDebugSwitcher`
+
 ### Changed
 
 - `Environment`

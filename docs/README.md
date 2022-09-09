@@ -10,7 +10,8 @@ Configure your Orisai CMF/Nette application
 	- [Debug mode](#debug-mode)
 		- [At localhost](#at-localhost)
 		- [With env variable](#with-env-variable)
-		- [With cookie](#with-cookie)
+		- [With cookie - manually configured](#with-cookie---manually-configured)
+		- [With cookie - switched at runtime](#with-cookie---switched-at-runtime)
 	- [Parameters](#parameters)
 		- [Dynamic parameters](#dynamic-parameters)
 		- [Predefined parameters](#predefined-parameters)
@@ -171,7 +172,7 @@ use OriNette\DI\Boot\Environment;
 Environment::isEnvDebug('VARIABLE_NAME');
 ```
 
-#### With cookie
+#### With cookie - manually configured
 
 Set debug cookie in your browser
 
@@ -209,6 +210,78 @@ use OriNette\DI\Boot\CookieGetter;
 use OriNette\DI\Boot\Environment;
 
 Environment::hasCookie(CookieGetter::fromEnv());
+```
+
+#### With cookie - switched at runtime
+
+Enable debug mode on click in your administration
+
+```php
+use OriNette\DI\Boot\Environment;
+use OriNette\DI\Boot\FileDebugCookieStorage;
+
+$cookieStorage = new FileDebugCookieStorage(__DIR__ . '/debug-cookie-values.json');
+$configurator->addServices([
+	'orisai.di.cookie.storage' => $cookieStorage,
+]);
+
+$configurator->setDebugMode(
+	Environment::isCookieDebug($cookieStorage),
+);
+```
+
+Register debug switcher and storage as services
+
+```neon
+services:
+	orisai.di.cookie.storage:
+		type: OriNette\DI\Boot\DebugCookieStorage
+		imported: true
+
+	orisai.di.cookie.debugSwitcher: OriNette\DI\Bridge\NetteHttp\CookieDebugSwitcher
+```
+
+Switch debug mode in presenter
+
+```php
+use Nette\Application\UI\Presenter;
+use OriNette\DI\Bridge\NetteHttp\CookieDebugSwitcher;
+
+final class DevPresenter extends Presenter
+{
+
+	private CookieDebugSwitcher $cookieDebugSwitcher;
+
+	public function __construct(CookieDebugSwitcher $cookieDebugSwitcher)
+	{
+		parent::__construct();
+		$this->cookieDebugSwitcher = $cookieDebugSwitcher;
+	}
+
+	public function handleStartDebug(): void
+	{
+		// TODO - check permissions
+		$this->cookieDebugSwitcher->startDebug();
+
+		$this->redirect('this');
+	}
+
+	public function handleStopDebug(): void
+	{
+		// TODO - check permissions
+		$this->cookieDebugSwitcher->stopDebug();
+
+		$this->redirect('this');
+	}
+
+}
+```
+
+Create links to switches
+
+```latte
+<a n:href="startDebug!" type="button">Start debug</a>
+<a n:href="stopDebug!" type="button">Stop debug</a>
 ```
 
 ### Parameters

@@ -10,3 +10,6 @@ parameters:
 
 	ignoreErrors:
 		- '#^Call to deprecated method isEnvDebugMode\(\) of class OriNette\\DI\\Boot\\Environment(.+)#'
+
+		# Method return value may change, don't care enough to search for fix
+		- "#^Offset 'Set-Cookie' does not exist on array\\{\\}\\.$#"
