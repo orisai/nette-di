@@ -17,6 +17,9 @@ use const PHP_SAPI;
 final class Environment
 {
 
+	/** @internal */
+	public const SidDebugCookie = 'orisai-debug-sid';
+
 	/**
 	 * @param non-empty-string $variableName
 	 */
@@ -31,7 +34,7 @@ final class Environment
 	 * @param non-empty-string $variableName
 	 *
 	 * @deprecated Use isEnvDebug() instead
-	 * @see self::isEnvDebug()
+	 * @see        self::isEnvDebug()
 	 */
 	public static function isEnvDebugMode(string $variableName = 'ORISAI_DEBUG'): bool
 	{
@@ -92,8 +95,8 @@ final class Environment
 	}
 
 	/**
-	 * @param array<int|string, string>    $values
-	 * @param non-empty-string $cookieName
+	 * @param array<int|string, string> $values
+	 * @param non-empty-string          $cookieName
 	 */
 	public static function hasCookie(array $values, string $cookieName = 'orisai-debug'): bool
 	{
@@ -124,6 +127,17 @@ final class Environment
 	public static function isConsole(): bool
 	{
 		return PHP_SAPI === 'cli';
+	}
+
+	public static function isCookieDebug(DebugCookieStorage $storage): bool
+	{
+		$value = $_COOKIE[self::SidDebugCookie] ?? null;
+
+		if ($value === null) {
+			return false;
+		}
+
+		return $storage->has($value);
 	}
 
 }

@@ -3,6 +3,8 @@
 namespace Tests\OriNette\DI\Unit\Boot;
 
 use OriNette\DI\Boot\Environment;
+use OriNette\DI\Boot\FileDebugCookieStorage;
+use Orisai\VFS\VFS;
 use PHPUnit\Framework\TestCase;
 use const PHP_SAPI;
 
@@ -198,6 +200,22 @@ final class EnvironmentTest extends TestCase
 	public function testConsole(): void
 	{
 		self::assertSame(PHP_SAPI === 'cli', Environment::isConsole());
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 */
+	public function testCookieDebugSession(): void
+	{
+		$cookieStorage = new FileDebugCookieStorage(VFS::register() . '://dir/file.json');
+
+		self::assertFalse(Environment::isCookieDebug($cookieStorage));
+
+		$_COOKIE[Environment::SidDebugCookie] = '1';
+		self::assertFalse(Environment::isCookieDebug($cookieStorage));
+
+		$cookieStorage->add('1');
+		self::assertTrue(Environment::isCookieDebug($cookieStorage));
 	}
 
 }
