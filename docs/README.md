@@ -258,20 +258,24 @@ final class DevPresenter extends Presenter
 		$this->cookieDebugSwitcher = $cookieDebugSwitcher;
 	}
 
-	public function handleStartDebug(): void
+	public function handleSwitchDebug(): void
 	{
-		// TODO - check permissions
-		$this->cookieDebugSwitcher->startDebug();
+		if (/* TODO - if not allowed */) {
+			$this->error();
+		}
+
+		if ($this->cookieDebugSwitcher->isDebug()) {
+			$this->cookieDebugSwitcher->stopDebug();
+		} else {
+			$this->cookieDebugSwitcher->startDebug();
+		}
 
 		$this->redirect('this');
 	}
 
-	public function handleStopDebug(): void
+	public function renderDefault(): void
 	{
-		// TODO - check permissions
-		$this->cookieDebugSwitcher->stopDebug();
-
-		$this->redirect('this');
+		$this->template->isCookieDebug = $this->cookieDebugSwitcher->isDebug();
 	}
 
 }
@@ -280,8 +284,14 @@ final class DevPresenter extends Presenter
 Create links to switches
 
 ```latte
-<a n:href="startDebug!" type="button">Start debug</a>
-<a n:href="stopDebug!" type="button">Stop debug</a>
+{* TODO - render only if allowed *}
+<a n:href="switchDebug!" type="button">
+	{if $isCookieDebug}
+		Stop debug
+	{else}
+		Start debug
+	{/if}
+</a>
 ```
 
 ### Parameters

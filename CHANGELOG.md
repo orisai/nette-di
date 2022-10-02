@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.1.0...HEAD)
 
+### Added
+
+- `CookieDebugSwitcher`
+  - `isDebug()` (as an alias to `Environment::isCookieDebug($switcher)`)
+
 ## [1.1.0](https://github.com/orisai/nette-di/compare/1.0.8...1.1.0) - 2022-09-09
 
 ### Added

@@ -187,6 +187,32 @@ final class CookieDebugSwitcherTest extends TestCase
 		self::assertFalse($storage->has($value));
 	}
 
+	/**
+	 * @runInSeparateProcess
+	 */
+	public function testSwitchEnv(): void
+	{
+		$storage = new FileDebugCookieStorage(VFS::register() . '://dir/file.json');
+		$request = new Request(new UrlScript('https://example.com'));
+		$switcher = new CookieDebugSwitcher($request, $this->response, $storage);
+
+		self::assertFalse($switcher->isDebug());
+		self::assertFalse(Environment::isCookieDebug($storage));
+
+		$switcher->startDebug();
+		$value = substr($this->response->getHeaders()['Set-Cookie'][0], strlen('orisai-debug-sid='));
+		$_COOKIE[Environment::SidDebugCookie] = $value;
+
+		self::assertTrue($switcher->isDebug());
+		self::assertTrue(Environment::isCookieDebug($storage));
+
+		$switcher->stopDebug();
+		unset($_COOKIE[Environment::SidDebugCookie]);
+
+		self::assertFalse($switcher->isDebug());
+		self::assertFalse(Environment::isCookieDebug($storage));
+	}
+
 	public function testStopNoCookie(): void
 	{
 		$storage = new FileDebugCookieStorage(VFS::register() . '://dir/file.json');

@@ -25,6 +25,11 @@ final class CookieDebugSwitcher
 		$this->storage = $storage;
 	}
 
+	public function isDebug(): bool
+	{
+		return Environment::isCookieDebug($this->storage);
+	}
+
 	public function startDebug(): void
 	{
 		$value = bin2hex(random_bytes(128));
