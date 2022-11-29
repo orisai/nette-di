@@ -287,9 +287,9 @@ Create links to switches
 {* TODO - render only if allowed *}
 <a n:href="switchDebug!" type="button">
 	{if $isCookieDebug}
-		Stop debug
+	Stop debug
 	{else}
-		Start debug
+	Start debug
 	{/if}
 </a>
 ```
@@ -404,6 +404,15 @@ reported as uncovered. This issue can be solved by always reloading container:
 
 ```php
 $configurator->setForceReloadContainer();
+```
+
+In rare edge cases, you may want to test a failing call inside `initialize()` method of DIC and yet still be able to
+create container. In that case, force configurator to not initialize container and do it yourself instead:
+
+```php
+$container = $configurator->createContainer(false);
+// ...
+$container->initialize();
 ```
 
 ### Import services

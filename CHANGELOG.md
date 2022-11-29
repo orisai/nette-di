@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.2.0...HEAD)
 
+### Added
+
+- `BaseConfigurator`
+  - `createContainer()` allows to not call `initialize()` on container
+
 ## [1.2.0](https://github.com/orisai/nette-di/compare/1.1.0...1.2.0) - 2022-10-02
 
 ### Added

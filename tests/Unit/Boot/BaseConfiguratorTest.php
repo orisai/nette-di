@@ -292,6 +292,32 @@ final class BaseConfiguratorTest extends TestCase
 		self::assertSame('file', $parameters['p3']);
 	}
 
+	public function testInitialize(): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addConfig(__DIR__ . '/initialize.neon');
+
+		$container = $configurator->createContainer();
+		$parameters = $container->parameters;
+
+		self::assertArrayHasKey('initializeCallingExtension', $parameters);
+		self::assertSame('called', $parameters['initializeCallingExtension']);
+	}
+
+	public function testNotInitialize(): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters(['__unique' => __METHOD__]);
+		$configurator->addConfig(__DIR__ . '/initialize.neon');
+
+		$container = $configurator->createContainer(false);
+		$parameters = $container->parameters;
+
+		self::assertArrayNotHasKey('initializeCallingExtension', $parameters);
+	}
+
 	/**
 	 * @runInSeparateProcess
 	 */
