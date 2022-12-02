@@ -5,6 +5,7 @@
 		"bootstrap",
 		"configuration",
 		"dependency-injection",
+		"di",
 		"nette",
 		"orisai"
 	],
