@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.2.1...HEAD)
 
+- Composer
+	- allows PHP 8.2
+
 ## [1.2.1](https://github.com/orisai/nette-di/compare/1.2.0...1.2.1) - 2022-11-29
 
 ### Added

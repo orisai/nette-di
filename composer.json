@@ -19,7 +19,7 @@
 		}
 	],
 	"require": {
-		"php": ">=7.4.0 <8.2.0",
+		"php": ">=7.4.0 <8.3.0",
 		"nette/di": "^3.0.5",
 		"orisai/exceptions": "^1.0.0",
 		"orisai/utils": "^1.0.0"
@@ -29,7 +29,7 @@
 		"infection/infection": "^0.26.0",
 		"latte/latte": "^2.10.0",
 		"nette/http": "^3.0.0",
-		"orisai/coding-standard": "^2.0.0",
+		"orisai/coding-standard": "^3.0.0",
 		"orisai/nette-http": "^1.0.0",
 		"orisai/vfs": "^1.0.0",
 		"phpstan/extension-installer": "^1.0.0",

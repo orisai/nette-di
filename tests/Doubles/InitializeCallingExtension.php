@@ -12,7 +12,7 @@ final class InitializeCallingExtension extends CompilerExtension
 		parent::beforeCompile();
 
 		$this->initialization->addBody(
-			"\$this->parameters['initializeCallingExtension'] = 'called';"
+			"\$this->parameters['initializeCallingExtension'] = 'called';",
 		);
 	}
 
