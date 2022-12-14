@@ -22,7 +22,7 @@ abstract class ServiceManager
 	/**
 	 * @param array<int|string, string> $serviceMap
 	 */
-	final public function __construct(array $serviceMap, Container $container)
+	public function __construct(array $serviceMap, Container $container)
 	{
 		$this->serviceMap = $serviceMap;
 		$this->container = $container;

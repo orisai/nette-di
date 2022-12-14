@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.2.2...HEAD)
 
+### Changed
+
+- `ServiceManager` - constructor is not final
+
 ## [1.2.2](https://github.com/orisai/nette-di/compare/1.2.1...1.2.2) - 2022-12-09
+
+### Changed
 
 - Composer
 	- allows PHP 8.2
