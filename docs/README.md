@@ -21,6 +21,7 @@ Configure your Orisai CMF/Nette application
 	- [Compilation](#compilation)
 	- [Cache warmup](#cache-warmup)
 - [Constants extension](#constants-extension)
+- [PHP extension](#php-extension)
 - [Definitions loader](#definitions-loader)
 - [Service manager](#service-manager)
 
@@ -487,6 +488,19 @@ extensions:
 
 constants:
 	constantName: constantValue
+```
+
+## PHP extension
+
+Define [php.ini directives](https://www.php.net/manual/en/ini.list.php)
+via [`ini_set()`](https://www.php.net/manual/en/function.ini-set) when DIC is instantiated
+
+```neon
+extensions:
+	php: OriNette\DI\Boot\Extensions\PhpExtension
+
+php:
+	date.timezone: UTC
 ```
 
 ## Definitions loader

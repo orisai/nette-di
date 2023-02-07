@@ -1,0 +1,6 @@
+extensions:
+	php: OriNette\DI\Boot\Extensions\PhpExtension
+
+php:
+	date.timezone: Europe/Rome
+	exit_on_timeout: null
