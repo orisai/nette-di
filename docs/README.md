@@ -20,6 +20,7 @@ Configure your Orisai CMF/Nette application
 	- [Import services](#import-services)
 	- [Compilation](#compilation)
 	- [Cache warmup](#cache-warmup)
+- [Constants extension](#constants-extension)
 - [Definitions loader](#definitions-loader)
 - [Service manager](#service-manager)
 
@@ -474,6 +475,18 @@ $configurator->addStaticParameters([
 $configurator->loadContainer();
 
 // etc.
+```
+
+## Constants extension
+
+Define constant via `define()` when DIC is instantiated
+
+```neon
+extensions:
+	constants: OriNette\DI\Boot\Extensions\ConstantsExtension
+
+constants:
+	constantName: constantValue
 ```
 
 ## Definitions loader

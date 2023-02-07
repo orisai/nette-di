@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.2.3...HEAD)
 
+### Added
+
+- `ConstantsExtension`
+
 ## [1.2.3](https://github.com/orisai/nette-di/compare/1.2.2...1.2.3) - 2022-12-14
 
 ### Changed
