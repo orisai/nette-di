@@ -22,7 +22,8 @@
 		"php": ">=7.4.0 <8.3.0",
 		"nette/di": "^3.0.5",
 		"orisai/exceptions": "^1.0.0",
-		"orisai/utils": "^1.0.0"
+		"orisai/utils": "^1.0.0",
+		"symfony/polyfill-php80": "^1.27"
 	},
 	"require-dev": {
 		"brianium/paratest": "^6.3.0",

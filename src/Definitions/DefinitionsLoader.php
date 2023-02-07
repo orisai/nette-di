@@ -8,14 +8,15 @@ use Nette\DI\Definitions\Reference;
 use Nette\DI\Definitions\Statement;
 use Nette\Schema\Elements\AnyOf;
 use Nette\Schema\Expect;
-use Nette\Utils\Strings;
 use Orisai\Exceptions\Logic\InvalidArgument;
 use function array_key_exists;
 use function assert;
 use function class_exists;
 use function is_array;
 use function is_string;
+use function str_contains;
 use function str_replace;
+use function str_starts_with;
 use function substr;
 
 final class DefinitionsLoader
@@ -46,7 +47,7 @@ final class DefinitionsLoader
 		$builder = $this->compiler->getContainerBuilder();
 
 		// Definition is defined by external source (e.g. ServicesExtension), try to get it
-		if (is_string($config) && Strings::startsWith($config, '@') && !Strings::contains($config, '::')) {
+		if (is_string($config) && str_starts_with($config, '@') && !str_contains($config, '::')) {
 			$definitionName = substr($config, 1);
 			assert($definitionName !== false);
 
