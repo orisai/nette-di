@@ -248,7 +248,7 @@ abstract class BaseConfigurator
 		return $containerClass;
 	}
 
-	public function createContainer(bool $callInitialize = true): Container
+	public function createContainer(bool $initialize = true): Container
 	{
 		$containerClass = $this->loadContainer();
 		$container = new $containerClass($this->dynamicParameters);
@@ -258,7 +258,7 @@ abstract class BaseConfigurator
 		}
 
 		assert(method_exists($container, 'initialize'));
-		if ($callInitialize) {
+		if ($initialize) {
 			$container->initialize();
 		}
 
