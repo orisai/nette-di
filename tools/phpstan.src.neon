@@ -13,3 +13,4 @@ parameters:
 
 		# compatibility
 		- '#^Fetching deprecated class constant SELF of class Nette\\DI\\Definitions\\Reference(.+)#'
+		- '#^Fetching deprecated class constant (FORCE\_ARRAY|PRETTY) of class Nette\\Utils\\Json(.+)#'

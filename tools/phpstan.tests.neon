@@ -10,3 +10,4 @@ parameters:
 
 	ignoreErrors:
 		- '#^Call to deprecated method isEnvDebugMode\(\) of class OriNette\\DI\\Boot\\Environment(.+)#'
+		- '#^Fetching deprecated class constant FORCE\_ARRAY of class Nette\\Utils\\Json(.+)#'
