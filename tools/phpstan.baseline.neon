@@ -1,0 +1,41 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Parameter \\#1 \\$json of static method Nette\\\\Utils\\\\Json\\:\\:decode\\(\\) expects string, string\\|false given\\.$#"
+			count: 1
+			path: ../tests/Doubles/JsonAdapter.php
+
+		-
+			message: "#^Call to function is_subclass_of\\(\\) with class\\-string\\<Nette\\\\DI\\\\Container\\> and 'Nette\\\\\\\\DI\\\\\\\\Container' will always evaluate to true\\.$#"
+			count: 1
+			path: ../tests/Unit/Boot/BaseConfiguratorTest.php
+
+		-
+			message: "#^Call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Tests\\\\\\\\OriNette\\\\\\\\DI\\\\\\\\Doubles\\\\\\\\TestService' and Tests\\\\OriNette\\\\DI\\\\Doubles\\\\TestService will always evaluate to true\\.$#"
+			count: 1
+			path: ../tests/Unit/Boot/BaseConfiguratorTest.php
+
+		-
+			message: "#^Call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertTrue\\(\\) with true will always evaluate to true\\.$#"
+			count: 1
+			path: ../tests/Unit/Boot/BaseConfiguratorTest.php
+
+		-
+			message: "#^Call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Tests\\\\\\\\OriNette\\\\\\\\DI\\\\\\\\Doubles\\\\\\\\TestService' and Tests\\\\OriNette\\\\DI\\\\Doubles\\\\TestService will always evaluate to true\\.$#"
+			count: 2
+			path: ../tests/Unit/Boot/ManualConfiguratorTest.php
+
+		-
+			message: "#^Call to function assert\\(\\) with true will always evaluate to true\\.$#"
+			count: 2
+			path: ../tests/Unit/Definitions/DefinitionsLoaderTest.php
+
+		-
+			message: "#^Instanceof between Tests\\\\OriNette\\\\DI\\\\Doubles\\\\TestService and Tests\\\\OriNette\\\\DI\\\\Doubles\\\\TestService will always evaluate to true\\.$#"
+			count: 2
+			path: ../tests/Unit/Definitions/DefinitionsLoaderTest.php
+
+		-
+			message: "#^Call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertNotNull\\(\\) with Orisai\\\\Exceptions\\\\Logic\\\\InvalidArgument will always evaluate to true\\.$#"
+			count: 2
+			path: ../tests/Unit/Services/ServiceManagerTest.php
