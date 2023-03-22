@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.3.0...HEAD)
 
+### Fixed
+
+- `BaseConfigurator`
+	- `unlink()` may fail when reloading Container multiple times in a same process (in tests)
+
 ## [1.3.0](https://github.com/orisai/nette-di/compare/1.2.3...1.3.0) - 2023-02-15
 
 ### Added

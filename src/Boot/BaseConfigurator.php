@@ -293,7 +293,7 @@ abstract class BaseConfigurator
 		$this->forceReloadContainer
 		&& !class_exists($containerClass = $loader->getClassName($containerKey), false)
 		&& is_file($file = "$buildDir/$containerClass.php")
-		&& unlink($file);
+		&& @unlink($file);
 	}
 
 }
