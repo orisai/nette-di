@@ -48,7 +48,7 @@ final class Environment
 	 * {$prefix}{$delimiter}{NAME-1}({$delimiter}{NAME-n})
 	 *
 	 * @param non-empty-string $delimiter
-	 * @return array<string, mixed>
+	 * @return array<int|string, mixed>
 	 */
 	public static function loadEnvParameters(string $prefix = 'ORISAI', string $delimiter = '__'): array
 	{
@@ -59,11 +59,11 @@ final class Environment
 		$parameters = [];
 		$prefixLength = strlen($prefix);
 		foreach ($_SERVER + getenv() as $key => $value) {
-			if ($prefix !== '' && strncmp($key, $prefix, $prefixLength) !== 0) {
+			if ($prefix !== '' && strncmp((string) $key, $prefix, $prefixLength) !== 0) {
 				continue;
 			}
 
-			$nonPrefixedKey = substr($key, $prefixLength);
+			$nonPrefixedKey = substr((string) $key, $prefixLength);
 			assert($nonPrefixedKey !== false);
 			self::mapParameters(
 				$parameters,

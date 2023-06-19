@@ -69,6 +69,7 @@ final class EnvironmentTest extends TestCase
 			'ANOTHER_PREFIX_UPPER_lower_MiXeD' => 'upper.lower.mixed',
 
 			'IGNORED' => 'ignored',
+			0 => 'numeric key',
 		];
 
 		self::assertSame(
@@ -122,12 +123,14 @@ final class EnvironmentTest extends TestCase
 		$_SERVER = [
 			'KEY' => 'key',
 			'ANOTHER__KEY' => 'another.key',
+			0 => 'numeric key',
 		];
 
 		$parameters = Environment::loadEnvParameters('');
 
 		self::assertSame($parameters['key'], 'key');
 		self::assertSame($parameters['another'], ['key' => 'another.key']);
+		self::assertSame($parameters[0], 'numeric key');
 	}
 
 	public function testEnvParametersGetEnvFallback(): void
