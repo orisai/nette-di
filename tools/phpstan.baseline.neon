@@ -1,6 +1,22 @@
 parameters:
 	ignoreErrors:
 		-
+			message: """
+				#^Fetching deprecated class constant DEVELOPMENT of class Tracy\\\\Debugger\\:
+				use Debugger\\:\\:Development$#
+			"""
+			count: 1
+			path: ../src/Boot/BaseConfigurator.php
+
+		-
+			message: """
+				#^Fetching deprecated class constant PRODUCTION of class Tracy\\\\Debugger\\:
+				use Debugger\\:\\:Production$#
+			"""
+			count: 1
+			path: ../src/Boot/BaseConfigurator.php
+
+		-
 			message: "#^Parameter \\#1 \\$json of static method Nette\\\\Utils\\\\Json\\:\\:decode\\(\\) expects string, string\\|false given\\.$#"
 			count: 1
 			path: ../tests/Doubles/JsonAdapter.php
@@ -17,6 +33,22 @@ parameters:
 
 		-
 			message: "#^Call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertTrue\\(\\) with true will always evaluate to true\\.$#"
+			count: 1
+			path: ../tests/Unit/Boot/BaseConfiguratorTest.php
+
+		-
+			message: """
+				#^Fetching deprecated class constant DEVELOPMENT of class Tracy\\\\Debugger\\:
+				use Debugger\\:\\:Development$#
+			"""
+			count: 1
+			path: ../tests/Unit/Boot/BaseConfiguratorTest.php
+
+		-
+			message: """
+				#^Fetching deprecated class constant PRODUCTION of class Tracy\\\\Debugger\\:
+				use Debugger\\:\\:Production$#
+			"""
 			count: 1
 			path: ../tests/Unit/Boot/BaseConfiguratorTest.php
 
