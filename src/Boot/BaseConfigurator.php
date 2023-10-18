@@ -31,7 +31,6 @@ use function class_exists;
 use function filemtime;
 use function is_file;
 use function is_subclass_of;
-use function method_exists;
 use function mkdir;
 use function unlink;
 use const DATE_ATOM;
@@ -257,7 +256,6 @@ abstract class BaseConfigurator
 			$container->addService($name, $service);
 		}
 
-		assert(method_exists($container, 'initialize'));
 		if ($initialize) {
 			$container->initialize();
 		}
