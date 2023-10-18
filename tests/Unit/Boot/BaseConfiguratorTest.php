@@ -91,7 +91,7 @@ final class BaseConfiguratorTest extends TestCase
 		$configurator->addDynamicParameters(['dynamic' => 'dynamic']);
 
 		$container = $configurator->createContainer();
-		$parameters = $container->parameters;
+		$parameters = $container->getParameters();
 
 		self::assertSame($rootDir, $parameters['rootDir']);
 		self::assertSame($rootDir . '/src', $parameters['appDir']);
@@ -151,7 +151,7 @@ final class BaseConfiguratorTest extends TestCase
 		]);
 
 		$container = $configurator->createContainer();
-		$parameters = $container->parameters;
+		$parameters = $container->getParameters();
 
 		self::assertSame('%test%', $parameters['param1']);
 		self::assertSame('@@test', $parameters['param2']);
@@ -218,7 +218,7 @@ final class BaseConfiguratorTest extends TestCase
 		};
 
 		$container = $configurator->createContainer();
-		$parameters = $container->parameters;
+		$parameters = $container->getParameters();
 		self::assertSame('test1', $parameters['test1']);
 		self::assertSame('test2', $parameters['test2']);
 		self::assertSame('test3', $parameters['test3']);
@@ -262,7 +262,7 @@ final class BaseConfiguratorTest extends TestCase
 		};
 
 		$container = $configurator->createContainer();
-		self::assertSame('test', $container->parameters['test']);
+		self::assertSame('test', $container->getParameters()['test']);
 	}
 
 	public function testPriority(): void
@@ -285,7 +285,7 @@ final class BaseConfiguratorTest extends TestCase
 		};
 
 		$container = $configurator->createContainer();
-		$parameters = $container->parameters;
+		$parameters = $container->getParameters();
 
 		self::assertSame('static', $parameters['p1']);
 		self::assertSame('compiler', $parameters['p2']);
@@ -299,7 +299,7 @@ final class BaseConfiguratorTest extends TestCase
 		$configurator->addConfig(__DIR__ . '/initialize.neon');
 
 		$container = $configurator->createContainer();
-		$parameters = $container->parameters;
+		$parameters = $container->getParameters();
 
 		self::assertArrayHasKey('initializeCallingExtension', $parameters);
 		self::assertSame('called', $parameters['initializeCallingExtension']);
@@ -313,7 +313,7 @@ final class BaseConfiguratorTest extends TestCase
 		$configurator->addConfig(__DIR__ . '/initialize.neon');
 
 		$container = $configurator->createContainer(false);
-		$parameters = $container->parameters;
+		$parameters = $container->getParameters();
 
 		self::assertArrayNotHasKey('initializeCallingExtension', $parameters);
 	}
