@@ -4,7 +4,6 @@ namespace OriNette\DI\Boot;
 
 use function array_key_exists;
 use function array_shift;
-use function assert;
 use function count;
 use function explode;
 use function getenv;
@@ -64,7 +63,6 @@ final class Environment
 			}
 
 			$nonPrefixedKey = substr((string) $key, $prefixLength);
-			assert($nonPrefixedKey !== false);
 			self::mapParameters(
 				$parameters,
 				explode($delimiter, strtolower($nonPrefixedKey)),
