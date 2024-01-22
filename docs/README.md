@@ -155,6 +155,7 @@ Set env variable to `true` or `1`
 
 ```sh
 # Set env variable in console for current session
+# Or add the line to file ~/.bashrc to set it permanently
 export ORISAI_DEBUG=true
 ```
 
