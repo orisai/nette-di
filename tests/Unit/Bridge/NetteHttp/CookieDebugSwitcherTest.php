@@ -35,8 +35,8 @@ final class CookieDebugSwitcherTest extends TestCase
 		// Value is available on the next request, we have to re-create
 		$request = new Request(
 			new UrlScript('https://example.com'),
-			null,
-			null,
+			[],
+			[],
 			[
 				Environment::SidDebugCookie => $value,
 			],
