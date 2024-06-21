@@ -7,9 +7,9 @@ use Nette\Http\UrlScript;
 use OriNette\DI\Boot\Environment;
 use OriNette\DI\Boot\FileDebugCookieStorage;
 use OriNette\DI\Bridge\NetteHttp\CookieDebugSwitcher;
-use OriNette\Http\Tester\TestResponse;
 use Orisai\VFS\VFS;
 use PHPUnit\Framework\TestCase;
+use Tests\OriNette\DI\Doubles\TestResponse;
 
 final class CookieDebugSwitcherTest extends TestCase
 {

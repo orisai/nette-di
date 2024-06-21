@@ -22,6 +22,14 @@ parameters:
 			path: ../tests/Doubles/JsonAdapter.php
 
 		-
+			message: """
+				#^Fetching deprecated class constant S302_FOUND of class Tests\\\\OriNette\\\\DI\\\\Doubles\\\\TestResponse\\:
+				use IResponse\\:\\:S302_Found$#
+			"""
+			count: 1
+			path: ../tests/Doubles/TestResponse.php
+
+		-
 			message: "#^Call to function is_subclass_of\\(\\) with class\\-string\\<Nette\\\\DI\\\\Container\\> and 'Nette\\\\\\\\DI\\\\\\\\Container' will always evaluate to true\\.$#"
 			count: 1
 			path: ../tests/Unit/Boot/BaseConfiguratorTest.php

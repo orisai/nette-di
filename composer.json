@@ -31,7 +31,6 @@
 		"latte/latte": "^2.10.0",
 		"nette/http": "^3.0.0",
 		"orisai/coding-standard": "^3.0.0",
-		"orisai/nette-http": "^1.0.0",
 		"orisai/vfs": "^1.0.0",
 		"phpstan/extension-installer": "^1.0.0",
 		"phpstan/phpstan": "^1.0.0",
