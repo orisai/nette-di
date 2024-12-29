@@ -7,11 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.3.3...v1.x)
 
+### Changed
+
+- Composer
+	- Allow PHP 8.4
+
 ## [1.3.3](https://github.com/orisai/nette-di/compare/1.3.2...1.3.3) - 2024-06-21
 
-### Added
+### Changed
 
-- Allow PHP 8.3
+- Composer
+	- Allow PHP 8.3
 
 ## [1.3.2](https://github.com/orisai/nette-di/compare/1.3.1...1.3.2) - 2023-06-20
 
@@ -45,7 +51,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 
 - Composer
-	- allows PHP 8.2
+	- Allow PHP 8.2
 
 ## [1.2.1](https://github.com/orisai/nette-di/compare/1.2.0...1.2.1) - 2022-11-29
 
