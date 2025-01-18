@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.3.4...v1.x)
 
+### Added
+
+- Support for IntelliJ Neon Pro plugin
+
 ## [1.3.4](https://github.com/orisai/nette-di/compare/1.3.3...1.3.4) - 2024-12-29
 
 ### Changed

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE neon PUBLIC "-//NEON//Neon plugin XML V0.0.1//EN" "../.idea/intellij-neon-pro/xmlSources/Neon.xsd">
+<neon vendor="orisai/nette-di" version="1">
+	<extensions>
+		<extension type="OriNette\DI\Boot\Extensions\ConstantsExtension">
+			<schema>
+				<arrayOf>
+					<key>
+						<string/>
+					</key>
+					<value>
+						<int/>
+						<float/>
+						<string/>
+						<bool/>
+						<null/>
+						<arrayOf>
+							<value>
+								<mixed/>
+							</value>
+						</arrayOf>
+					</value>
+				</arrayOf>
+			</schema>
+		</extension>
+		<extension type="OriNette\DI\Boot\Extensions\PhpExtension">
+			<schema>
+				<arrayOf>
+					<key>
+						<string/>
+					</key>
+					<value>
+						<int/>
+						<float/>
+						<string/>
+						<bool/>
+						<null/>
+					</value>
+				</arrayOf>
+			</schema>
+		</extension>
+	</extensions>
+</neon>
