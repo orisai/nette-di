@@ -38,9 +38,6 @@ use const PHP_RELEASE_VERSION;
 use const PHP_SAPI;
 use const PHP_VERSION_ID;
 
-/**
- * @internal
- */
 abstract class BaseConfigurator
 {
 
