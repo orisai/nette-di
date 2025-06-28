@@ -348,6 +348,8 @@ Configurator define some parameters you may need:
 	- public directory, should be the only one accessible via webserver - defaults to `%rootDir%/public`
 - `%debugMode%`
 	- whether application is in debug mode
+- `%productionMode%`
+	- whether application is in debug mode
 - `%consoleMode%`
 	- whether application is in console mode
 - `%container%`

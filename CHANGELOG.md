@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- parameters stubs
+- `stubs/parameters.neon`
 	- Description of the parameters
+- `BaseConfigurator`
+	- `%productionMode%` parameter (matches nette/bootstrap behavior)
 
 ## [1.3.5](https://github.com/orisai/nette-di/compare/1.3.4...1.3.5) - 2025-01-18
 

@@ -88,6 +88,7 @@ abstract class BaseConfigurator
 			'vendorDir' => $this->rootDir . '/vendor',
 			'wwwDir' => $this->rootDir . '/public',
 			'debugMode' => false,
+			'productionMode' => true,
 			'consoleMode' => PHP_SAPI === 'cli',
 		];
 	}
@@ -105,6 +106,7 @@ abstract class BaseConfigurator
 	public function setDebugMode(bool $debugMode): void
 	{
 		$this->staticParameters['debugMode'] = $debugMode;
+		$this->staticParameters['productionMode'] = !$debugMode;
 	}
 
 	public function enableDebugger(): void

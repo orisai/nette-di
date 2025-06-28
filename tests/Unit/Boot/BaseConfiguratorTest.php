@@ -102,6 +102,7 @@ final class BaseConfiguratorTest extends TestCase
 		self::assertSame($rootDir . '/vendor', $parameters['vendorDir']);
 		self::assertSame($rootDir . '/public', $parameters['wwwDir']);
 		self::assertTrue($parameters['debugMode']);
+		self::assertFalse($parameters['productionMode']);
 		self::assertTrue($parameters['consoleMode']);
 		self::assertSame('test', $parameters['test']);
 		self::assertSame('dynamic', $parameters['dynamic']);
@@ -111,8 +112,8 @@ final class BaseConfiguratorTest extends TestCase
 		self::assertArrayHasKey('className', $parameters['container']);
 
 		// 10 default + 1 dynamic (container) + 2 from test
-		self::assertCount(10 + 1 + 2, $parameters);
-		self::assertCount(10, $configurator->getDefaultParameters());
+		self::assertCount(11 + 1 + 2, $parameters);
+		self::assertCount(11, $configurator->getDefaultParameters());
 	}
 
 	public function testParametersSpecificContainer(): void
