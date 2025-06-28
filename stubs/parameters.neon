@@ -2,18 +2,18 @@
 parameters:
 
 	# BaseConfigurator parameters
-	rootDir: ''
-	appDir: %rootDir%/src
-	buildDir: %rootDir%/var/build
-	dataDir: %rootDir%/data
-	logDir: %rootDir%/var/log
-	tempDir: %rootDir%/var/cache
-	vendorDir: %rootDir%/vendor
-	wwwDir: %rootDir%/public
-	debugMode: false
-	consoleMode: false
+	rootDir: '' # Absolute path to project root directory
+	appDir: %rootDir%/src # Absolute path to source code
+	buildDir: %rootDir%/var/build # Absolute path to permanently cached files (DI container, latte files, ...)
+	dataDir: %rootDir%/data # Absolute path to internally stored data
+	logDir: %rootDir%/var/log # Absolute path to logs
+	tempDir: %rootDir%/var/cache # Absolute path to temporary files
+	vendorDir: %rootDir%/vendor # Absolute path to Composer libraries
+	wwwDir: %rootDir%/public # Absolute path to public directory which shall be available through the webserver
+	debugMode: false # Is application in debug mode?
+	consoleMode: false # Did request come from command line (CLI)?
 
-	container:
+	container: # General information about the generated DI container class
 		className: Container_<hash>
 		compiledAt: 1970-01-01T00:00:00+00:00
 		compiledAtTimestamp: 0

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.3.5...v1.x)
 
+### Added
+
+- parameters stubs
+	- Description of the parameters
+
 ## [1.3.5](https://github.com/orisai/nette-di/compare/1.3.4...1.3.5) - 2025-01-18
 
 ### Added
