@@ -1,81 +1,124 @@
 parameters:
 	ignoreErrors:
 		-
-			message: """
-				#^Fetching deprecated class constant DEVELOPMENT of class Tracy\\\\Debugger\\:
-				use Debugger\\:\\:Development$#
-			"""
+			message: '#^Access to constant on internal class Latte\\Bridges\\Tracy\\BlueScreenPanel\.$#'
+			identifier: classConstant.internalClass
 			count: 1
 			path: ../src/Boot/BaseConfigurator.php
 
 		-
-			message: """
-				#^Fetching deprecated class constant PRODUCTION of class Tracy\\\\Debugger\\:
-				use Debugger\\:\\:Production$#
-			"""
+			message: '#^Call to static method escape\(\) of internal class Nette\\DI\\Helpers from outside its root namespace Nette\.$#'
+			identifier: staticMethod.internalClass
 			count: 1
 			path: ../src/Boot/BaseConfigurator.php
 
 		-
-			message: "#^Parameter \\#1 \\$json of static method Nette\\\\Utils\\\\Json\\:\\:decode\\(\\) expects string, string\\|false given\\.$#"
+			message: '#^Call to static method initialize\(\) of internal class Latte\\Bridges\\Tracy\\BlueScreenPanel from outside its root namespace Latte\.$#'
+			identifier: staticMethod.internalClass
+			count: 1
+			path: ../src/Boot/BaseConfigurator.php
+
+		-
+			message: '#^Call to static method merge\(\) of internal class Nette\\Schema\\Helpers from outside its root namespace Nette\.$#'
+			identifier: staticMethod.internalClass
+			count: 1
+			path: ../src/Boot/BaseConfigurator.php
+
+		-
+			message: '''
+				#^Fetching deprecated class constant DEVELOPMENT of class Tracy\\Debugger\:
+				use Debugger\:\:Development$#
+			'''
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Boot/BaseConfigurator.php
+
+		-
+			message: '''
+				#^Fetching deprecated class constant PRODUCTION of class Tracy\\Debugger\:
+				use Debugger\:\:Production$#
+			'''
+			identifier: classConstant.deprecated
+			count: 1
+			path: ../src/Boot/BaseConfigurator.php
+
+		-
+			message: '#^Parameter \#1 \$json of static method Nette\\Utils\\Json\:\:decode\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: ../tests/Doubles/JsonAdapter.php
 
 		-
-			message: """
-				#^Fetching deprecated class constant S302_FOUND of class Tests\\\\OriNette\\\\DI\\\\Doubles\\\\TestResponse\\:
-				use IResponse\\:\\:S302_Found$#
-			"""
+			message: '''
+				#^Fetching deprecated class constant S302_FOUND of interface Nette\\Http\\IResponse\:
+				use IResponse\:\:S302_Found$#
+			'''
+			identifier: classConstant.deprecated
 			count: 1
 			path: ../tests/Doubles/TestResponse.php
 
 		-
-			message: "#^Call to function is_subclass_of\\(\\) with class\\-string\\<Nette\\\\DI\\\\Container\\> and 'Nette\\\\\\\\DI\\\\\\\\Container' will always evaluate to true\\.$#"
+			message: '#^Call to function is_subclass_of\(\) with class\-string\<Nette\\DI\\Container\> and ''Nette\\\\DI\\\\Container'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 1
 			path: ../tests/Unit/Boot/BaseConfiguratorTest.php
 
 		-
-			message: "#^Call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Tests\\\\\\\\OriNette\\\\\\\\DI\\\\\\\\Doubles\\\\\\\\TestService' and Tests\\\\OriNette\\\\DI\\\\Doubles\\\\TestService will always evaluate to true\\.$#"
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Tests\\\\OriNette\\\\DI\\\\Doubles\\\\TestService'' and Tests\\OriNette\\DI\\Doubles\\TestService will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
 			count: 1
 			path: ../tests/Unit/Boot/BaseConfiguratorTest.php
 
 		-
-			message: "#^Call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertTrue\\(\\) with true will always evaluate to true\\.$#"
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
 			count: 1
 			path: ../tests/Unit/Boot/BaseConfiguratorTest.php
 
 		-
-			message: """
-				#^Fetching deprecated class constant DEVELOPMENT of class Tracy\\\\Debugger\\:
-				use Debugger\\:\\:Development$#
-			"""
+			message: '''
+				#^Fetching deprecated class constant DEVELOPMENT of class Tracy\\Debugger\:
+				use Debugger\:\:Development$#
+			'''
+			identifier: classConstant.deprecated
 			count: 1
 			path: ../tests/Unit/Boot/BaseConfiguratorTest.php
 
 		-
-			message: """
-				#^Fetching deprecated class constant PRODUCTION of class Tracy\\\\Debugger\\:
-				use Debugger\\:\\:Production$#
-			"""
+			message: '''
+				#^Fetching deprecated class constant PRODUCTION of class Tracy\\Debugger\:
+				use Debugger\:\:Production$#
+			'''
+			identifier: classConstant.deprecated
 			count: 1
 			path: ../tests/Unit/Boot/BaseConfiguratorTest.php
 
 		-
-			message: "#^Call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Tests\\\\\\\\OriNette\\\\\\\\DI\\\\\\\\Doubles\\\\\\\\TestService' and Tests\\\\OriNette\\\\DI\\\\Doubles\\\\TestService will always evaluate to true\\.$#"
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Tests\\\\OriNette\\\\DI\\\\Doubles\\\\TestService'' and Tests\\OriNette\\DI\\Doubles\\TestService will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
 			count: 2
 			path: ../tests/Unit/Boot/ManualConfiguratorTest.php
 
 		-
-			message: "#^Call to function assert\\(\\) with true will always evaluate to true\\.$#"
+			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 2
 			path: ../tests/Unit/Definitions/DefinitionsLoaderTest.php
 
 		-
-			message: "#^Instanceof between Tests\\\\OriNette\\\\DI\\\\Doubles\\\\TestService and Tests\\\\OriNette\\\\DI\\\\Doubles\\\\TestService will always evaluate to true\\.$#"
+			message: '#^Call to internal method Nette\\DI\\Container\:\:findAutowired\(\) from outside its root namespace Nette\.$#'
+			identifier: method.internal
+			count: 1
+			path: ../tests/Unit/Definitions/DefinitionsLoaderTest.php
+
+		-
+			message: '#^Instanceof between Tests\\OriNette\\DI\\Doubles\\TestService and Tests\\OriNette\\DI\\Doubles\\TestService will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
 			count: 2
 			path: ../tests/Unit/Definitions/DefinitionsLoaderTest.php
 
 		-
-			message: "#^Call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertNotNull\\(\\) with Orisai\\\\Exceptions\\\\Logic\\\\InvalidArgument will always evaluate to true\\.$#"
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertNotNull\(\) with Orisai\\Exceptions\\Logic\\InvalidArgument will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
 			count: 2
 			path: ../tests/Unit/Services/ServiceManagerTest.php

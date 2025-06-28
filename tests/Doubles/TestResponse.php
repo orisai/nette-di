@@ -105,7 +105,7 @@ final class TestResponse implements IResponse
 		return $this;
 	}
 
-	public function redirect(string $url, int $code = self::S302_FOUND): void
+	public function redirect(string $url, int $code = IResponse::S302_FOUND): void
 	{
 		$this->setCode($code);
 		$this->setHeader('Location', $url);
