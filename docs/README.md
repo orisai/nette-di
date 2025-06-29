@@ -346,6 +346,10 @@ Configurator define some parameters you may need:
 	- defaults to `%rootDir%/vendor`
 - `%wwwDir%`
 	- public directory, should be the only one accessible via webserver - defaults to `%rootDir%/public`
+- `%baseUrl%`
+	- base url of your app
+	- e.g. `https//example.com`
+	- requires [nette/http](https://github.com/nette/http)
 - `%debugMode%`
 	- whether application is in debug mode
 - `%productionMode%`

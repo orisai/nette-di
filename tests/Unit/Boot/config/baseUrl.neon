@@ -1,0 +1,4 @@
+services:
+	- Nette\Http\Request(
+		Nette\Http\UrlScript('https://example.com/')
+	)

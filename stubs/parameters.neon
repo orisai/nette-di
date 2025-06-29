@@ -10,6 +10,7 @@ parameters:
 	tempDir: %rootDir%/var/cache # Absolute path to temporary files
 	vendorDir: %rootDir%/vendor # Absolute path to Composer libraries
 	wwwDir: %rootDir%/public # Absolute path to public directory which shall be available through the webserver
+	baseUrl: 'https://127.0.0.1' # Absolute URL to project root (without ending slash)
 	debugMode: false # Is application in debug mode?
 	productionMode: true # Opposite of debugMode
 	consoleMode: false # Did request come from command line (CLI)?

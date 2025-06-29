@@ -1,0 +1,2 @@
+services:
+	orisai.di.boot.baseUrl: OriNette\DI\Boot\Parameters\BaseUrl

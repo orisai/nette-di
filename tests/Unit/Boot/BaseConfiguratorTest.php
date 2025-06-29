@@ -101,6 +101,7 @@ final class BaseConfiguratorTest extends TestCase
 		self::assertSame($rootDir . '/var/cache', $parameters['tempDir']);
 		self::assertSame($rootDir . '/vendor', $parameters['vendorDir']);
 		self::assertSame($rootDir . '/public', $parameters['wwwDir']);
+		self::assertNull($parameters['baseUrl']);
 		self::assertTrue($parameters['debugMode']);
 		self::assertFalse($parameters['productionMode']);
 		self::assertTrue($parameters['consoleMode']);
@@ -112,8 +113,8 @@ final class BaseConfiguratorTest extends TestCase
 		self::assertArrayHasKey('className', $parameters['container']);
 
 		// 10 default + 1 dynamic (container) + 2 from test
-		self::assertCount(11 + 1 + 2, $parameters);
-		self::assertCount(11, $configurator->getDefaultParameters());
+		self::assertCount(12 + 1 + 2, $parameters);
+		self::assertCount(12, $configurator->getDefaultParameters());
 	}
 
 	public function testParametersSpecificContainer(): void
@@ -341,6 +342,19 @@ final class BaseConfiguratorTest extends TestCase
 			['tracy/tracy'],
 			$exception->getPackages(),
 		);
+	}
+
+	public function testBaseUrl(): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+
+		$configurator->addConfig(__DIR__ . '/config/baseUrl.neon');
+
+		$container = $configurator->createContainer();
+		$parameters = $container->getParameters();
+
+		self::assertSame('https://example.com', $parameters['baseUrl']);
 	}
 
 }

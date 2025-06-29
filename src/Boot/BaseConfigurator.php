@@ -14,10 +14,12 @@ use Nette\DI\Config\Adapter;
 use Nette\DI\Config\Loader;
 use Nette\DI\Container;
 use Nette\DI\ContainerLoader;
+use Nette\DI\Definitions\Statement;
 use Nette\DI\Extensions\ExtensionsExtension;
 use Nette\DI\Helpers as DIHelpers;
 use Nette\PhpGenerator\Literal;
 use Nette\Schema\Helpers as ConfigHelpers;
+use OriNette\DI\Boot\Parameters\BaseUrl;
 use Orisai\Utils\Dependencies\Dependencies;
 use Orisai\Utils\Dependencies\Exception\PackageRequired;
 use ReflectionClass;
@@ -26,6 +28,7 @@ use Tracy\Bridges\Nette\Bridge;
 use Tracy\Debugger;
 use Traversable;
 use function array_keys;
+use function array_merge;
 use function assert;
 use function class_exists;
 use function filemtime;
@@ -87,6 +90,7 @@ abstract class BaseConfigurator
 			'tempDir' => $this->rootDir . '/var/cache',
 			'vendorDir' => $this->rootDir . '/vendor',
 			'wwwDir' => $this->rootDir . '/public',
+			'baseUrl' => new Statement('@' . BaseUrl::class . '::get'),
 			'debugMode' => false,
 			'productionMode' => true,
 			'consoleMode' => PHP_SAPI === 'cli',
@@ -181,14 +185,15 @@ abstract class BaseConfigurator
 			$loader->addAdapter($extension, $adapter);
 		}
 
+		$compiler->loadConfig(__DIR__ . '/Parameters/wiring.neon');
 		foreach ($configFiles as $configFile) {
 			$compiler->loadConfig($configFile, $loader);
 		}
 
 		$now = new DateTimeImmutable();
 
-		$parameters = DIHelpers::escape($this->staticParameters) +
-			[
+		$parameters = DIHelpers::escape($this->staticParameters)
+			+ [
 				'container' => [
 					'compiledAtTimestamp' => (int) $now->format('U'),
 					'compiledAt' => $now->format(DATE_ATOM),
@@ -196,7 +201,10 @@ abstract class BaseConfigurator
 				],
 			];
 		$compiler->addConfig(['parameters' => $parameters]);
-		$compiler->setDynamicParameterNames(array_keys($this->dynamicParameters));
+		$compiler->setDynamicParameterNames(array_merge(
+			array_keys($this->dynamicParameters),
+			['baseUrl'],
+		),);
 
 		$builder = $compiler->getContainerBuilder();
 		$builder->addExcludedClasses($this->autowireExcludedClasses);
