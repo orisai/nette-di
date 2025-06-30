@@ -1,29 +1,34 @@
 # Nette DI
 
-Configure your Orisai CMF/Nette application
+Configure your Nette application
 
 ## Content
 
 - [Setup](#setup)
 - [Configurator](#configurator)
-	- [Configuration](#configuration)
+	- [Config files](#config-files)
 	- [Debug mode](#debug-mode)
 		- [At localhost](#at-localhost)
+		- [In console](#in-console)
 		- [With env variable](#with-env-variable)
 		- [With cookie - manually configured](#with-cookie---manually-configured)
 		- [With cookie - switched at runtime](#with-cookie---switched-at-runtime)
 	- [Parameters](#parameters)
-		- [Dynamic parameters](#dynamic-parameters)
 		- [Predefined parameters](#predefined-parameters)
+		- [Static parameters](#static-parameters)
+		- [Dynamic parameters](#dynamic-parameters)
 		- [Load parameters from env variables](#load-parameters-from-env-variables)
 	- [Testing mode](#testing-mode)
 	- [Import services](#import-services)
 	- [Compilation](#compilation)
-	- [Cache warmup](#cache-warmup)
-- [Constants extension](#constants-extension)
-- [PHP extension](#php-extension)
-- [Definitions loader](#definitions-loader)
-- [Service manager](#service-manager)
+	- [Cache warm-up](#cache-warmup)
+	- [Differences from nette/bootstrap](#differences-from-nettebootstrap)
+- [DI extensions](#di-extensions)
+	- [Constants extension](#constants-extension)
+	- [PHP extension](#php-extension)
+- [Definitions and services](#definitions-and-services)
+	- [Definitions loader](#definitions-loader)
+	- [Service manager](#service-manager)
 
 ## Setup
 
@@ -35,12 +40,18 @@ composer require orisai/nette-di
 
 ## Configurator
 
-An alternative for [nette/bootstrap](https://github.com/nette/bootstrap)
+Configurator builds DI container and runs the whole application.
 
-- none of the extensions is loaded by default
-- debug mode is disabled unless you enable it
+It is an alternative to [nette/bootstrap](https://github.com/nette/bootstrap).
 
-To use it, create bootstrap class where you preconfigure your application
+- Extensions are not loaded by default and have to be explicitly registered.
+- Debug mode is not auto-detected and has to be explicitly enabled.
+- Read more about differences and reasons behind them [here](#differences-from-nettebootstrap).
+
+Create a bootstrap class where you pre‑configure your application:
+
+> [!NOTE]
+> This is just an example, [enable debug mode](#debug-mode) and [add config files](#config-files) the way you need.
 
 ```php
 namespace App;
@@ -54,9 +65,8 @@ final class Bootstrap
 
 	public static function boot(): ManualConfigurator
 	{
-		$configurator = new ManualConfigurator(dirname(__DIR__));
-
-		$configurator->addStaticParameters(Environment::loadEnvParameters());
+		$rootDir = dirname(__DIR__);
+		$configurator = new ManualConfigurator($rootDir);
 
 		$configurator->setDebugMode(
 			Environment::isEnvDebug()
@@ -72,8 +82,8 @@ final class Bootstrap
 	}
 
 	/**
-	 * @return array<string>
- 	 */
+	 * @return list<string>
+	 */
 	private static function getDebugCookieValues(): array
 	{
 		return [];
@@ -82,7 +92,7 @@ final class Bootstrap
 }
 ```
 
-In application entrypoint (`index.php`) - get the configurator, create a container, get the application and run it.
+In the application entry point (`index.php`) – get the configurator, create a container, get the application and run it:
 
 ```php
 use App\Bootstrap;
@@ -96,15 +106,16 @@ Bootstrap::boot()
 	->run();
 ```
 
-### Configuration
+### Config files
 
-Add config files
+Add configuration files:
 
 ```php
 $configurator->addConfig(__DIR__ . '/../config/local.neon');
 ```
 
-By default, `neon` and `php` files supported. For other formats, add an own adapter:
+Configurator has built-in support for `.neon` and `.php` files. For other formats, create own implementation of
+`Nette\DI\Config\Adapter`:
 
 ```php
 $configurator->addConfigAdapter('json', new JsonAdapter());
@@ -112,21 +123,22 @@ $configurator->addConfigAdapter('json', new JsonAdapter());
 
 ### Debug mode
 
-Set debug mode
+When debug mode is on, the container regenerates whenever any configuration file or service changes.
+
+Enable or disable debug mode:
 
 ```php
-$configurator->setDebugMode($condition);
+$configurator->setDebugMode(
+	Environment::isEnvDebug()
+	|| Environment::isLocalhost()
+);
 ```
 
-After you set debug mode, enable debugger
-
-- Requires [Tracy](https://github.com/nette/tracy) to be installed
+And enable [Tracy](https://github.com/nette/tracy) debugger (if installed):
 
 ```php
 $configurator->enableDebugger();
 ```
-
-If debug mode is enabled and any of configuration files or services changes, container regenerates.
 
 #### At localhost
 
@@ -136,6 +148,10 @@ use OriNette\DI\Boot\Environment;
 $configurator->setDebugMode(Environment::isLocalhost());
 ```
 
+> [!TIP]
+> This approach does not work when running app behind a proxy, because it would be unsafe to support it for apps without
+> proxy. For proxied apps prefer the [env variable](#with-env-variable) approach.
+
 #### In console
 
 ```php
@@ -144,22 +160,31 @@ use OriNette\DI\Boot\Environment;
 $configurator->setDebugMode(Environment::isConsole());
 ```
 
-Preferably use [env variable](#with-env-variable) for your local console, otherwise debug mode will be enabled in
-console also on production.
+> [!TIP]
+> Prefer the [env variable](#with-env-variable) approach for local console work; otherwise production CLI will
+> also run in debug mode.
 
 #### With env variable
 
-Useful for enabling debug mode in console
-
-Set env variable to `true` or `1`
+Define env variable `ORISAI_DEBUG` with a truthy value (`1` or `true`).
 
 ```sh
-# Set env variable in console for current session
-# Or add the line to file ~/.bashrc to set it permanently
-export ORISAI_DEBUG=true
+# Temporary – current shell session only
+export ORISAI_DEBUG=1
+
+# Persistent – Bash
+echo 'export ORISAI_DEBUG=1' >> ~/.bashrc
+source ~/.bashrc # load without opening a new terminal
+
+# Persistent – Z shell
+echo 'export ORISAI_DEBUG=1' >> ~/.zshrc
+source ~/.zshrc
+
+# Persistent – system‑wide (Debian‑based)
+echo 'ORISAI_DEBUG=1' | sudo tee -a /etc/environment
 ```
 
-Check env variable in bootstrap
+Check it in bootstrap:
 
 ```php
 use OriNette\DI\Boot\Environment;
@@ -167,57 +192,56 @@ use OriNette\DI\Boot\Environment;
 $configurator->setDebugMode(Environment::isEnvDebug());
 ```
 
-We can also change the variable name to something else
+The variable name can be changed:
 
 ```php
-use OriNette\DI\Boot\Environment;
-
-Environment::isEnvDebug('VARIABLE_NAME');
+Environment::isEnvDebug('APP_DEBUG');
 ```
 
 #### With cookie - manually configured
 
-Set debug cookie in your browser
+> [!CAUTION]
+> It is critical to use long and cryptographically secure values. With debug mode enabled, an attacker can retrieve all
+> app credentials and more.
 
-`orisai-debug = really_long_and_secure_cookie_value`
-
-Check cookie value in bootstrap
+Generate a secure cookie value:
 
 ```php
-use OriNette\DI\Boot\Environment;
+echo bin2hex(random_bytes(128));
+```
 
+Set a debug cookie in your browser:
+
+```
+orisai-debug = really_long_and_secure_cookie_value
+```
+
+Check the cookie value in bootstrap:
+
+```php
 $configurator->setDebugMode(Environment::hasCookie([
 	'really_long_and_secure_cookie_value',
 	'another_really_long_and_secure_cookie_value',
 ]));
 ```
 
-*Be paranoid and always generate long cookie values like 30+ characters long*
-
-We can also change the cookie name to something else
+You can also change the cookie name:
 
 ```php
-use OriNette\DI\Boot\Environment;
-
 Environment::hasCookie($cookieValues, 'cookie-name');
 ```
 
-List of cookie values can be easily obtained from an env variable
-
-- By default is expected env variable `DEBUG_COOKIE_VALUES` with values separated by a comma
-	- `DEBUG_COOKIE_VALUES = val1,val2`
-- Spaces around value and empty values are safely removed
+List the cookie values via an env variable:
 
 ```php
 use OriNette\DI\Boot\CookieGetter;
-use OriNette\DI\Boot\Environment;
 
 Environment::hasCookie(CookieGetter::fromEnv());
 ```
 
 #### With cookie - switched at runtime
 
-Enable debug mode on click in your administration
+Enable debug mode with a click inside your administration UI:
 
 ```php
 use OriNette\DI\Boot\Environment;
@@ -233,7 +257,7 @@ $configurator->setDebugMode(
 );
 ```
 
-Register debug switcher and storage as services
+Register the debug switcher and storage as services:
 
 ```neon
 services:
@@ -244,7 +268,7 @@ services:
 	orisai.di.cookie.debugSwitcher: OriNette\DI\Bridge\NetteHttp\CookieDebugSwitcher
 ```
 
-Switch debug mode in presenter
+Switch debug mode in a presenter:
 
 ```php
 use Nette\Application\UI\Presenter;
@@ -263,7 +287,7 @@ final class DevPresenter extends Presenter
 
 	public function handleSwitchDebug(): void
 	{
-		if (/* TODO - if not allowed */) {
+		if (/* TODO – check permission */) {
 			$this->error();
 		}
 
@@ -284,10 +308,10 @@ final class DevPresenter extends Presenter
 }
 ```
 
-Create links to switches
+Create links to the switcher:
 
 ```latte
-{* TODO - render only if allowed *}
+{* TODO – check permission *}
 <a n:href="switchDebug!" type="button">
 	{if $isCookieDebug}
 	Stop debug
@@ -299,7 +323,31 @@ Create links to switches
 
 ### Parameters
 
-Add parameters which can be used
+Parameters are values used for configuring services and are available in neon via `%parameterName%` syntax and in
+compiler extensions.
+
+#### Predefined parameters
+
+|          Parameter | Description                                                              | Example / Default                                                        |
+|-------------------:|:-------------------------------------------------------------------------|:-------------------------------------------------------------------------|
+|        `%rootDir%` | Base path to your app                                                    | `/path/to/project`                                                       |
+|         `%appDir%` | Source‑code path                                                         | `%rootDir%/src`                                                          |
+|        `%dataDir%` | Uploaded data path                                                       | `%rootDir%/data`                                                         |
+|         `%logDir%` | Log files path                                                           | `%rootDir%/var/log`                                                      |
+|       `%buildDir%` | Permanently stored cache path                                            | `%rootDir%/var/build`                                                    |
+|        `%tempDir%` | Temporarily stored cache path                                            | `%rootDir%/var/tmp`                                                      |
+|      `%vendorDir%` | Composer libraries path                                                  | `%rootDir%/vendor`                                                       |
+|         `%wwwDir%` | Public directory (web‑server‑accessible)                                 | `%rootDir%/public`                                                       |
+|        `%baseUrl%` | Base URL of your app (needs [nette/http](https://github.com/nette/http)) | e.g. `https://example.com`                                               |
+|      `%debugMode%` | Is the application in **debug** mode?                                    | `false`                                                                  |
+| `%productionMode%` | Opposite of debug mode                                                   | `true`                                                                   |
+|    `%consoleMode%` | Is the application running in CLI?                                       | `PHP_SAPI === 'cli'`                                                     |
+|      `%container%` | Info about the DI container                                              | `array{className: string, compiledAt: string, compiledAtTimestamp: int}` |
+
+#### Static parameters
+
+Static parameters do not change at all or have just a few variations. New container is generated every time parameter is
+added, removed or when its value changes.
 
 ```php
 $configurator->addStaticParameters([
@@ -307,12 +355,10 @@ $configurator->addStaticParameters([
 ]);
 ```
 
-When a static parameter is added, removed or it's value changes then container is re-generated.
-
 #### Dynamic parameters
 
-Dynamic parameter value can be changed each request. Only when parameter is added or removed. then container is
-re-generated.
+A dynamic parameter’s value can change on every request; new container is generated only when parameter is added or
+removed.
 
 ```php
 $configurator->addDynamicParameters([
@@ -320,48 +366,13 @@ $configurator->addDynamicParameters([
 ]);
 ```
 
-#### Predefined parameters
-
-Configurator define some parameters you may need:
-
-- `%rootDir%`
-	- base path of your app
-- `%appDir%`
-	- source code path
-	- defaults to `%rootDir%/src`
-- `%buildDir%`
-	- permanently stored cache files
-	- defaults to `%rootDir%/var/build`
-- `%dataDir%`
-	- uploaded data
-	- defaults to `%rootDir%/data`
-- `%logDir%`
-	- log files
-	- defaults to `%rootDir%/var/log`
-- `%tempDir%`
-	- temporarily stored cache files
-	- defaults to `%rootDir%/var/tmp`
-- `%vendorDir%`
-	- third-party source code
-	- defaults to `%rootDir%/vendor`
-- `%wwwDir%`
-	- public directory, should be the only one accessible via webserver - defaults to `%rootDir%/public`
-- `%baseUrl%`
-	- base url of your app
-	- e.g. `https//example.com`
-	- requires [nette/http](https://github.com/nette/http)
-- `%debugMode%`
-	- whether application is in debug mode
-- `%productionMode%`
-	- whether application is in debug mode
-- `%consoleMode%`
-	- whether application is in console mode
-- `%container%`
-	- info about container - when it was compiled, name of the container
+> [!WARNING]
+> Unless the value is dynamic, prefer static parameters. Dynamic parameters are not available during compile-time and
+> may cause degraded performance.
 
 #### Load parameters from env variables
 
-Load environment variables and transform them into an array of parameters.
+Transform env variables into parameters:
 
 ```php
 use OriNette\DI\Boot\Environment;
@@ -369,65 +380,57 @@ use OriNette\DI\Boot\Environment;
 $configurator->addStaticParameters(Environment::loadEnvParameters());
 ```
 
-Env variables are transformed into array via pattern `PREFIX{delimiter}{NAME-1}{delimiter}{NAME-N}`.
-
-- default prefix is `ORISAI` and delimiter is `__`
-
-In following example is how env variable look and the resulting parameters after transformation
+Env‑vars match the pattern `PREFIX{delimiter}{NAME‑1}{delimiter}{NAME‑N}`. The default prefix is **ORISAI** and the delimiter is `__`.
 
 ```dotenv
-ORISAI__PARAMETER = parameter
-ORISAI__SINGLE_UNDERSCORE = single_underscore
-ORISAI__UPPER__lower__MiXeD = upper.lower.mixed
-ORISAI__UPPER__another__parameter = upper.another.parameter
+ORISAI__PARAMETER=1
+ORISAI__SINGLE_UNDERSCORE=2
+ORISAI__UPPER__lower__MiXeD=3
+ORISAI__UPPER__another__parameter=4
 ```
 
 ```neon
 parameters:
-	parameter: parameter
-	single_underscore: single_underscore
+	parameter: 1
+	single_underscore: 2
 	upper:
 		lower:
-			mixed: upper.lower.mixed
+			mixed: 3
 		another:
-			parameter: upper.another.parameter
+			parameter: 4
 ```
 
-We can can also change delimiter to e.g. `:` and prefix to e.g. `APP` or remove it completely and pass empty string `''`
+Delimiter and prefix can be changed:
 
 ```php
-use OriNette\DI\Boot\Environment;
-
 $configurator->addStaticParameters(Environment::loadEnvParameters('APP', ':'));
+// APP:PARAMETER=1
 ```
 
-This method uses `$_SERVER` instead of `getenv()` and so is safe to use under any conditions and is compatible with
-`.env` file libraries like [symfony/dotenv](https://github.com/symfony/dotenv).
+> [!NOTE]
+> Implementation is compatible with various runtimes and libraries such
+> as [symfony/dotenv](https://github.com/symfony/dotenv)
 
 ### Testing mode
 
-Generated container is cached on disk and does not reload unless one of dependencies changed and debug mode is enabled.
-While this makes sense during application runtime and development, it creates code coverage issues in automated tests.
-Compile-time code like compiler extensions is executed only once and second time tests are run, code is incorrectly
-reported as uncovered. This issue can be solved by always reloading container:
+The compiled container is cached on disk. During test runs this can break code‑coverage because compile‑time code like
+compiler extensions runs only once. Force a reload:
 
 ```php
 $configurator->setForceReloadContainer();
 ```
 
-In rare edge cases, you may want to test a failing call inside `initialize()` method of DIC and yet still be able to
-create container. In that case, force configurator to not initialize container and do it yourself instead:
+Need to test a failure inside `initialize()`? Create the container without initializing and handle it yourself:
 
 ```php
 $container = $configurator->createContainer(false);
-// ...
+// …
 $container->initialize();
 ```
 
 ### Import services
 
-In rare cases it may be useful to import a service into DI container via configurator. To do so, register service
-with `imported: true`.
+Import a runtime‑created service into the DI container by marking it as `imported: true`:
 
 ```neon
 services:
@@ -436,7 +439,7 @@ services:
 		imported: true
 ```
 
-In the bootstrap add the actual service instance.
+And provide the instance in bootstrap:
 
 ```php
 $configurator->addServices([
@@ -446,26 +449,29 @@ $configurator->addServices([
 
 ### Compilation
 
-In rare cases it may be useful to do something only when new `Container` is compiled. In such case, use the `onCompile`
-event.
+Run code only when the container is freshly compiled:
 
 ```php
 use Nette\DI\Compiler;
 
 $configurator->onCompile[] = function (Compiler $compiler): void {
-	// Do anything you want
+	// custom compile‑time logic
 };
 ```
 
 ### Cache warmup
 
-It is useful to create compiled `Container` on application deploy to speed up first requests.
+Warm up the compiled container during deploy to speed up the first requests:
 
 ```php
 $configurator->loadContainer();
 ```
 
-It's even possible to create multiple containers at the same time
+> [!IMPORTANT]
+> `loadContainer()` should be used instead of `createContainer()`. Otherwise, container would be instantiated and may
+> cause undesired side effects.
+
+Generate multiple variants if needed:
 
 ```php
 $configurator->addStaticParameters([
@@ -481,13 +487,55 @@ $configurator->addStaticParameters([
 ]);
 
 $configurator->loadContainer();
-
-// etc.
 ```
 
-## Constants extension
+### Differences from nette/bootstrap
 
-Define constant via `define()` when DIC is instantiated
+- Paths are based on root path instead of being automatically detected. This leads to lighter boot code and prevents
+  issues with `%wwwDir%` being wrong in console scripts and `%appDir%` being wrong when bootstrap is located elsewhere.
+	- On the other hand, `%vendorDir%` is set to `%rootDir%/vendor` instead of being detected based on Composer
+	  settings.
+- Default paths for `%appDir%`, `%logDir%`, `%tempDir%` and `%wwwDir%` match structure commonly used in Linux instead of
+  structure of nette/web-project.
+- `%buildDir` was introduced to divide permanent, generated files (compiled DI container and Latte templates) from
+  cache.
+- [Debug mode](#debug-mode) is not auto-detected and has to be explicitly enabled. Various new method of enabling it are
+  provided.
+- [Testing mode](#testing-mode) can be enabled for easier compile-time code coverage in tests.
+- Extensions are not loaded by default and have to be explicitly registered. This leads to lighter boot code and
+  simplifies testing of packages with optional dependencies.
+
+These are all the extensions registered by [nette/bootstrap](https://github.com/nette/bootstrap). Add those that you
+need to your configuration file.
+
+```neon
+extensions:
+	application: Nette\Bridges\ApplicationDI\ApplicationExtension(%debugMode%, %appDir%, %tempDir%/nette.application)
+	assets: Nette\Bridges\AssetsDI\DIExtension(%baseUrl%, %wwwDir%, %debugMode%)
+	cache: Nette\Bridges\CacheDI\CacheExtension(%tempDir%/nette.caching)
+	constants: OriNette\DI\Boot\Extensions\ConstantsExtension()
+	database: Nette\Bridges\DatabaseDI\DatabaseExtension(%debugMode%)
+	decorator: Nette\DI\Extensions\DecoratorExtension()
+	di: Nette\DI\Extensions\DIExtension(%debugMode%)
+	extensions: Nette\DI\Extensions\ExtensionsExtension()
+	forms: Nette\Bridges\FormsDI\FormsExtension()
+	http: Nette\Bridges\HttpDI\HttpExtension(%consoleMode%)
+	inject: Nette\DI\Extensions\InjectExtension()
+	latte: Nette\Bridges\ApplicationDI\LatteExtension(%buildDir%/latte, %debugMode%)
+	mail: Nette\Bridges\MailDI\MailExtension()
+	php: OriNette\DI\Boot\Extensions\PhpExtension()
+	routing: Nette\Bridges\ApplicationDI\RoutingExtension(%debugMode%)
+	search: Nette\DI\Extensions\SearchExtension(%tempDir%/nette.search)
+	security: Nette\Bridges\SecurityDI\SecurityExtension(%debugMode%)
+	session: Nette\Bridges\HttpDI\SessionExtension(%debugMode%, %consoleMode%)
+	tracy: Tracy\Bridges\Nette\TracyExtension(%debugMode%, %consoleMode%)
+```
+
+## DI extensions
+
+### Constants extension
+
+Define PHP constants via `define()` when the DI container is instantiated:
 
 ```neon
 extensions:
@@ -497,10 +545,10 @@ constants:
 	constantName: constantValue
 ```
 
-## PHP extension
+### PHP extension
 
-Define [php.ini directives](https://www.php.net/manual/en/ini.list.php)
-via [`ini_set()`](https://www.php.net/manual/en/function.ini-set) when DIC is instantiated
+Set [`php.ini` directives](https://www.php.net/manual/en/ini.list.php) via
+[`ini_set()`](https://www.php.net/manual/en/function.ini-set) when the container is instantiated:
 
 ```neon
 extensions:
@@ -510,33 +558,33 @@ php:
 	date.timezone: UTC
 ```
 
-## Definitions loader
+## Definitions and services
 
-Extensions can accept services in any format which is allowed by `services` section in the configuration and also accept
-references via `@serviceName` to services from `services`. To achieve this follow example below:
+### Definitions loader
 
-These are all valid ways how to write a service:
+With definitions loader, extensions can accept services in any syntax supported by the `services` section and may
+reference existing services via `@serviceName`.
 
 ```neon
 extensions:
 	example: ExampleExtension
 
 services:
-	referenced: ExampleService
-	referencedByType: AnotherExampleService
+	referenced.key: ExampleService
+	referenced.type: AnotherExampleService
 
 example:
 	services:
 		string: ExampleService
 		statement: ExampleService()
-		reference: @referenced
+		reference: @referenced.key
 		referenceByType: @AnotherExampleService
 		array:
 			factory: ExampleService
 ```
 
-Services loaded via `DefinitionsLoader` are *not autowired* by default because they are extension-specific. Autowiring
-of services referenced via `@serviceName` or with `autowired` explicitly set is not changed.
+Services loaded through `DefinitionsLoader` are **not autowired** by default because they are extension‑specific. You
+can still opt‑in to autowiring:
 
 ```neon
 example:
@@ -546,7 +594,7 @@ example:
 			autowired: true
 ```
 
-Integration of `DefinitionsLoader` which would load these definitions may look like this:
+A minimal integration looks like this:
 
 ```php
 use Nette\DI\CompilerExtension;
@@ -560,9 +608,7 @@ final class ExampleExtension extends CompilerExtension
 	public function getConfigSchema(): Schema
 	{
 		return Expect::structure([
-			'services' => Expect::arrayOf(
-				DefinitionsLoader::schema(),
-			),
+			'services' => Expect::arrayOf(DefinitionsLoader::schema()),
 		]);
 	}
 
@@ -574,30 +620,27 @@ final class ExampleExtension extends CompilerExtension
 
 		$config = $this->config;
 		foreach ($config->services as $serviceName => $serviceConfig) {
+			// Returns Reference for @referenced services that were not resolved yet and Definitions for all others
 			$definition = $loader->loadDefinitionFromConfig(
 				$serviceConfig,
-				// service name (in case of @referenced is defined an alias)
+				// service name (in case of @reference to an existing service, alias is added instead)
 				$this->prefix('definition.' . $serviceName)
 			);
-
-			// Do anything you want with the definition
-			//  - returns Reference if @referenced service was not loaded yet or instance of Definition otherwise
 		}
 	}
 
 }
 ```
 
-## Service manager
+### Service manager
 
-`ServiceManager` is a base class useful for lazy loading of multiple services of the same type.
+`ServiceManager` helps lazy‑load a set of related services. Internally it uses a map of service names provided via DI.
 
-Internally it uses array of service names obtainable by keys from DI container.
+> [!NOTE]
+> Like Nette factories and accessors, this is **not** the service‑locator anti‑pattern because services are
+> fully configured from outside.
 
-Note: Same as [nette/di](https://github.com/nette/di/) factories and accessors, this is not a service locator pattern,
-because obtained services are fully configured from outside.
-
-Example implementation which returns all services and validates they exist and are of certain type may look like this:
+Return all services and validate their types:
 
 ```php
 use OriNette\DI\Services\ServiceManager;
@@ -617,21 +660,20 @@ final class ExampleManager extends ServiceManager
 			return $this->examples;
 		}
 
-		$loaders = [];
+		$instances = [];
 		foreach ($this->getKeys() as $key) {
-			$loaders[$key] = $this->getTypedServiceOrThrow($key, Example::class);
+			$instances[$key] = $this->getTypedServiceOrThrow($key, Example::class);
 		}
 
-		return $this->examples = $loaders;
+		return $this->examples = $instances;
 	}
 
+}
 ```
 
-Or get services one by one, with possible nulls:
+Fetch services one by one and allow `null`:
 
 ```php
-use OriNette\DI\Services\ServiceManager;
-
 final class ExampleManager extends ServiceManager
 {
 
@@ -653,18 +695,19 @@ final class ExampleManager extends ServiceManager
 }
 ```
 
-Service manager may be registered in config like this:
+Register the manager in config:
 
 ```neon
 services:
-	- factory: ExampleManager
-	  arguments:
+	-
+		factory: ExampleManager
+		arguments:
 		serviceMap:
 			key: service.name
 			anotherKey: another.service.name
 ```
 
-You may combine various *protected* methods of `ServiceManager` to achieve various goals:
+Useful (protected) helpers inside `ServiceManager`:
 
 - `hasService(int|string $key): bool`
 - `getService(int|string $key): ?object`
