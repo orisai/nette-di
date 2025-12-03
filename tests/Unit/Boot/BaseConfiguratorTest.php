@@ -188,6 +188,17 @@ final class BaseConfiguratorTest extends TestCase
 		self::assertSame($this->rootDir . '/var/log', Debugger::$logDirectory);
 	}
 
+	public function testRobotLoader(): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$loader = $configurator->createRobotLoader()
+			->addDirectory(__DIR__)
+			->register();
+
+		self::assertNotEmpty($loader->getIndexedClasses());
+	}
+
 	public function testServices(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);

@@ -30,6 +30,7 @@
 		"infection/infection": "^0.26.0|^0.27.0|^0.28.0|^0.29.0",
 		"latte/latte": "^2.10.0|^3.0.0",
 		"nette/http": "^3.0.0",
+		"nette/robot-loader": "^3.2.0|^4.0.0",
 		"orisai/coding-standard": "^3.0.0",
 		"orisai/vfs": "^1.0.0",
 		"phpstan/extension-installer": "^1.0.0",

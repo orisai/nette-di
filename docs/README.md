@@ -22,6 +22,7 @@ Configure your Nette application
 	- [Import services](#import-services)
 	- [Compilation](#compilation)
 	- [Cache warm-up](#cache-warmup)
+	- [Autoloading classes](#autoloading-classes)
 	- [Differences from nette/bootstrap](#differences-from-nettebootstrap)
 - [DI extensions](#di-extensions)
 	- [Constants extension](#constants-extension)
@@ -487,6 +488,19 @@ $configurator->addStaticParameters([
 ]);
 
 $configurator->loadContainer();
+```
+
+### Autoloading classes
+
+Autoload any class from the given directory via [nette/robot-loader](https://github.com/nette/robot-loader)
+
+> [!NOTE]
+> Usage of Composer's PSR-4 autoloader should be preferred, this is purely for compatibility with apps that already use robot-loader.
+
+```php
+$configurator->createRobotLoader()
+	->addDirectory(__DIR__)
+	->register();
 ```
 
 ### Differences from nette/bootstrap

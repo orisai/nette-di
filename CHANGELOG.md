@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.4.0...v1.x)
 
+### Added
+
+- `BaseConfigurator`
+	- `createRobotLoader()`
+
 ## [1.4.0](https://github.com/orisai/nette-di/compare/1.3.5...1.4.0) - 2025-06-30
 
 ### Added

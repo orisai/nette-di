@@ -17,9 +17,11 @@ use Nette\DI\ContainerLoader;
 use Nette\DI\Definitions\Statement;
 use Nette\DI\Extensions\ExtensionsExtension;
 use Nette\DI\Helpers as DIHelpers;
+use Nette\Loaders\RobotLoader;
 use Nette\PhpGenerator\Literal;
 use Nette\Schema\Helpers as ConfigHelpers;
 use OriNette\DI\Boot\Parameters\BaseUrl;
+use Orisai\Exceptions\Logic\NotImplemented;
 use Orisai\Utils\Dependencies\Dependencies;
 use Orisai\Utils\Dependencies\Exception\PackageRequired;
 use ReflectionClass;
@@ -131,6 +133,23 @@ abstract class BaseConfigurator
 		if (class_exists(LatteBlueScreenPanel::class)) {
 			LatteBlueScreenPanel::initialize();
 		}
+	}
+
+	/**
+	 * @throws NotImplemented if RobotLoader is not available
+	 */
+	public function createRobotLoader(): RobotLoader
+	{
+		if (!class_exists(RobotLoader::class)) {
+			throw NotImplemented::create()
+				->withMessage('RobotLoader not found, do you have `nette/robot-loader` package installed?');
+		}
+
+		$loader = new RobotLoader();
+		$loader->setTempDirectory($this->staticParameters['buildDir'] . '/nette.robotLoader');
+		$loader->setAutoRefresh($this->staticParameters['debugMode']);
+
+		return $loader;
 	}
 
 	/**
