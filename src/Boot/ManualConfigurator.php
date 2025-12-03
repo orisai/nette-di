@@ -20,9 +20,6 @@ final class ManualConfigurator extends BaseConfigurator
 		$this->configAdapters[$extension] = $adapter;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	protected function loadConfigFiles(): array
 	{
 		return $this->configs;
