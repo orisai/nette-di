@@ -11,9 +11,6 @@ use function is_array;
 final class JsonAdapter implements Adapter
 {
 
-	/**
-	 * @return array<mixed>
-	 */
 	public function load(string $file): array
 	{
 		$config = Json::decode(file_get_contents($file), Json::FORCE_ARRAY);

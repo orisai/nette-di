@@ -80,11 +80,14 @@ final class TestResponse implements IResponse
 	}
 
 	/**
-	 * @return array<string, array<string>>
+	 * @return array<string, string>
 	 */
 	public function getHeaders(): array
 	{
-		return $this->headers;
+		return array_map(
+			static fn (array $values): string => implode(',', $values),
+			$this->headers,
+		);
 	}
 
 	public function deleteHeader(string $name): self

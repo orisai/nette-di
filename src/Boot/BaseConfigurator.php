@@ -265,7 +265,11 @@ abstract class BaseConfigurator
 		$this->reloadContainerOnDemand($loader, $containerKey, $buildDir);
 
 		$containerClass = $loader->load(
-			fn (Compiler $compiler) => $this->generateContainer($compiler, $configFiles),
+			function (Compiler $compiler) use ($configFiles): ?string {
+				$this->generateContainer($compiler, $configFiles);
+
+				return null;
+			},
 			$containerKey,
 		);
 		assert(is_subclass_of($containerClass, Container::class));
