@@ -524,19 +524,18 @@ need to your configuration file.
 
 ```neon
 extensions:
-	application: Nette\Bridges\ApplicationDI\ApplicationExtension(%debugMode%, %appDir%, %tempDir%/nette.application)
+	application: Nette\Bridges\ApplicationDI\ApplicationExtension(%debugMode%, [%appDir%], %tempDir%/nette.application)
 	assets: Nette\Bridges\AssetsDI\DIExtension(%baseUrl%, %wwwDir%, %debugMode%)
 	cache: Nette\Bridges\CacheDI\CacheExtension(%tempDir%/nette.caching)
 	constants: OriNette\DI\Boot\Extensions\ConstantsExtension()
 	database: Nette\Bridges\DatabaseDI\DatabaseExtension(%debugMode%)
 	decorator: Nette\DI\Extensions\DecoratorExtension()
 	di: Nette\DI\Extensions\DIExtension(%debugMode%)
-	extensions: Nette\DI\Extensions\ExtensionsExtension()
 	forms: Nette\Bridges\FormsDI\FormsExtension()
 	http: Nette\Bridges\HttpDI\HttpExtension(%consoleMode%)
 	inject: Nette\DI\Extensions\InjectExtension()
 	latte: Nette\Bridges\ApplicationDI\LatteExtension(%buildDir%/latte, %debugMode%)
-	mail: Nette\Bridges\MailDI\MailExtension()
+	mail: Nette\Bridges\MailDI\MailExtension(%debugMode%)
 	php: OriNette\DI\Boot\Extensions\PhpExtension()
 	routing: Nette\Bridges\ApplicationDI\RoutingExtension(%debugMode%)
 	search: Nette\DI\Extensions\SearchExtension(%tempDir%/nette.search)
