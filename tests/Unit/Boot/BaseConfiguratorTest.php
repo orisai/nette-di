@@ -112,7 +112,7 @@ final class BaseConfiguratorTest extends TestCase
 		self::assertArrayHasKey('compiledAt', $parameters['container']);
 		self::assertArrayHasKey('className', $parameters['container']);
 
-		// 10 default + 1 dynamic (container) + 2 from test
+		// 12 default + 1 container + 2 from test
 		self::assertCount(12 + 1 + 2, $parameters);
 		self::assertCount(12, $configurator->getDefaultParameters());
 	}

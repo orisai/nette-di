@@ -336,7 +336,7 @@ compiler extensions.
 |        `%dataDir%` | Uploaded data path                                                       | `%rootDir%/data`                                                         |
 |         `%logDir%` | Log files path                                                           | `%rootDir%/var/log`                                                      |
 |       `%buildDir%` | Permanently stored cache path                                            | `%rootDir%/var/build`                                                    |
-|        `%tempDir%` | Temporarily stored cache path                                            | `%rootDir%/var/tmp`                                                      |
+|        `%tempDir%` | Temporarily stored cache path                                            | `%rootDir%/var/cache`                                                    |
 |      `%vendorDir%` | Composer libraries path                                                  | `%rootDir%/vendor`                                                       |
 |         `%wwwDir%` | Public directory (web‑server‑accessible)                                 | `%rootDir%/public`                                                       |
 |        `%baseUrl%` | Base URL of your app (needs [nette/http](https://github.com/nette/http)) | e.g. `https://example.com`                                               |
