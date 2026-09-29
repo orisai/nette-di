@@ -1,0 +1,2 @@
+includes:
+	- %appDir%/../tests/Unit/Boot/config/default-parameters.neon

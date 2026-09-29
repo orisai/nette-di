@@ -11,6 +11,8 @@ use IteratorAggregate;
 use Latte\Bridges\Tracy\BlueScreenPanel as LatteBlueScreenPanel;
 use Nette\DI\Compiler;
 use Nette\DI\Config\Adapter;
+use Nette\DI\Config\Adapters\NeonAdapter;
+use Nette\DI\Config\Adapters\PhpAdapter;
 use Nette\DI\Config\Loader;
 use Nette\DI\Container;
 use Nette\DI\ContainerLoader;
@@ -21,7 +23,12 @@ use Nette\Loaders\RobotLoader;
 use Nette\PhpGenerator\Literal;
 use Nette\Schema\Helpers as ConfigHelpers;
 use OriNette\DI\Boot\Parameters\BaseUrl;
+use OriNette\DI\Boot\Parameters\ConfigParametersGuard;
+use OriNette\DI\Boot\Parameters\GuardedConfigAdapter;
+use OriNette\DI\Boot\Parameters\ParametersValidationExtension;
+use Orisai\Exceptions\Logic\InvalidArgument;
 use Orisai\Exceptions\Logic\NotImplemented;
+use Orisai\Exceptions\Message;
 use Orisai\Utils\Dependencies\Dependencies;
 use Orisai\Utils\Dependencies\Exception\PackageRequired;
 use ReflectionClass;
@@ -29,11 +36,16 @@ use stdClass;
 use Tracy\Bridges\Nette\Bridge;
 use Tracy\Debugger;
 use Traversable;
+use function array_diff_key;
+use function array_flip;
+use function array_intersect_key;
+use function array_key_exists;
 use function array_keys;
 use function array_merge;
 use function assert;
 use function class_exists;
 use function filemtime;
+use function get_debug_type;
 use function is_file;
 use function is_subclass_of;
 use function mkdir;
@@ -45,6 +57,35 @@ use const PHP_VERSION_ID;
 
 abstract class BaseConfigurator
 {
+
+	private const ConfiguratorParameters = [
+		'rootDir',
+		'buildDir',
+		'logDir',
+		'debugMode',
+		'productionMode',
+		'consoleMode',
+	];
+
+	private const DedicatedSetters = [
+		'rootDir' => 'constructor',
+		'debugMode' => 'setDebugMode()',
+		'productionMode' => 'setDebugMode()',
+	];
+
+	private const ParameterTypes = [
+		'rootDir' => 'string',
+		'appDir' => 'string',
+		'buildDir' => 'string',
+		'dataDir' => 'string',
+		'logDir' => 'string',
+		'tempDir' => 'string',
+		'vendorDir' => 'string',
+		'wwwDir' => 'string',
+		'debugMode' => 'bool',
+		'productionMode' => 'bool',
+		'consoleMode' => 'bool',
+	];
 
 	protected string $rootDir;
 
@@ -61,6 +102,9 @@ abstract class BaseConfigurator
 	protected array $staticParameters;
 
 	/** @var array<string, mixed> */
+	private array $overridableParameters;
+
+	/** @var array<string, mixed> */
 	protected array $dynamicParameters = [];
 
 	/** @var array<string, object> */
@@ -75,6 +119,10 @@ abstract class BaseConfigurator
 	{
 		$this->rootDir = $rootDir;
 		$this->staticParameters = $this->getDefaultParameters();
+		$this->overridableParameters = array_diff_key(
+			$this->staticParameters,
+			array_flip(self::ConfiguratorParameters),
+		);
 	}
 
 	/**
@@ -157,10 +205,23 @@ abstract class BaseConfigurator
 	 */
 	public function addStaticParameters(array $parameters): self
 	{
+		foreach (self::DedicatedSetters as $name => $setter) {
+			if (array_key_exists($name, $parameters)) {
+				$this->throwInvalidParameter(
+					__FUNCTION__,
+					"Parameter '$name' can be changed only via $setter.",
+					"Use $setter instead.",
+				);
+			}
+		}
+
+		$this->checkParameterTypes(__FUNCTION__, $parameters);
+
 		/** @var array<string, mixed> $merged */
 		$merged = ConfigHelpers::merge($parameters, $this->staticParameters);
 
 		$this->staticParameters = $merged;
+		$this->overridableParameters = array_diff_key($this->overridableParameters, $parameters);
 
 		return $this;
 	}
@@ -170,9 +231,59 @@ abstract class BaseConfigurator
 	 */
 	public function addDynamicParameters(array $parameters): self
 	{
+		foreach (self::ConfiguratorParameters as $name) {
+			if (array_key_exists($name, $parameters)) {
+				$setter = self::DedicatedSetters[$name] ?? 'addStaticParameters()';
+				$this->throwInvalidParameter(
+					__FUNCTION__,
+					"Configurator parameter '$name' cannot be dynamic.",
+					"Use $setter instead.",
+				);
+			}
+		}
+
+		$this->checkParameterTypes(__FUNCTION__, $parameters);
+
 		$this->dynamicParameters = $parameters + $this->dynamicParameters;
 
 		return $this;
+	}
+
+	/**
+	 * @param array<string, mixed> $parameters
+	 */
+	private function checkParameterTypes(string $function, array $parameters): void
+	{
+		foreach (self::ParameterTypes as $name => $type) {
+			if (!array_key_exists($name, $parameters)) {
+				continue;
+			}
+
+			$givenType = get_debug_type($parameters[$name]);
+			if ($givenType !== $type) {
+				$this->throwInvalidParameter(
+					$function,
+					"Parameter '$name' must be $type, $givenType given.",
+					"Use value of type $type.",
+				);
+			}
+		}
+	}
+
+	/**
+	 * @return never
+	 */
+	private function throwInvalidParameter(string $function, string $problem, string $solution): void
+	{
+		$class = static::class;
+
+		$message = Message::create()
+			->withContext("Trying to call $class->$function().")
+			->withProblem($problem)
+			->withSolution($solution);
+
+		throw InvalidArgument::create()
+			->withMessage($message);
 	}
 
 	/**
@@ -200,18 +311,25 @@ abstract class BaseConfigurator
 		$loader = new Loader();
 		$loader->setParameters($this->staticParameters);
 
-		foreach ($this->configAdapters as $extension => $adapter) {
-			$loader->addAdapter($extension, $adapter);
+		$guard = new ConfigParametersGuard(self::ConfiguratorParameters, array_keys($this->overridableParameters));
+		$adapters = $this->configAdapters + ['neon' => new NeonAdapter(), 'php' => new PhpAdapter()];
+		foreach ($adapters as $extension => $adapter) {
+			$loader->addAdapter($extension, new GuardedConfigAdapter($adapter, $guard));
 		}
 
+		$parameters = DIHelpers::escape($this->staticParameters);
+		$overridableParameters = array_intersect_key($parameters, $this->overridableParameters);
+		$configuratorParameters = array_intersect_key($parameters, array_flip(self::ConfiguratorParameters));
+
 		$compiler->loadConfig(__DIR__ . '/Parameters/wiring.neon');
+		$compiler->addConfig(['parameters' => $overridableParameters]);
 		foreach ($configFiles as $configFile) {
 			$compiler->loadConfig($configFile, $loader);
 		}
 
 		$now = new DateTimeImmutable();
 
-		$parameters = DIHelpers::escape($this->staticParameters)
+		$parameters = array_diff_key($parameters, $overridableParameters)
 			+ [
 				'container' => [
 					'compiledAtTimestamp' => (int) $now->format('U'),
@@ -231,6 +349,11 @@ abstract class BaseConfigurator
 		$compiler->addExtension('extensions', new ExtensionsExtension());
 
 		$this->onCompile($compiler);
+
+		$compiler->addExtension('orisai.di.configurator', new ParametersValidationExtension(
+			$configuratorParameters,
+			self::ParameterTypes,
+		));
 	}
 
 	private function onCompile(Compiler $compiler): void
@@ -302,6 +425,7 @@ abstract class BaseConfigurator
 		/** @infection-ignore-all */
 		return [
 			$this->staticParameters,
+			array_keys($this->overridableParameters),
 			array_keys($this->dynamicParameters),
 			$configFiles,
 			PHP_VERSION_ID - PHP_RELEASE_VERSION,

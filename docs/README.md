@@ -345,6 +345,25 @@ compiler extensions.
 |    `%consoleMode%` | Is the application running in CLI?                                       | `PHP_SAPI === 'cli'`                                                     |
 |      `%container%` | Info about the DI container                                              | `array{className: string, compiledAt: string, compiledAtTimestamp: int}` |
 
+Predefined parameters can be changed by [static parameters](#static-parameters) or, with exception of the ones used by
+configurator itself, by config files. Value from static parameter has priority over value from config file.
+
+```neon
+parameters:
+	wwwDir: %rootDir%/www
+```
+
+Parameters `%rootDir%`, `%buildDir%`, `%logDir%`, `%debugMode%`, `%productionMode%` and `%consoleMode%` are used by
+configurator before the container is compiled. Changing them in a config file, via dynamic parameters or during
+compilation (e.g. by an extension) throws an exception. Same applies to changing parameter used in `includes` section of
+a config file.
+
+- `%rootDir%` is set via constructor
+- `%debugMode%` and `%productionMode%` are set via `setDebugMode()`
+- `%buildDir%`, `%logDir%` and `%consoleMode%` are set via static parameters
+
+All the `*Dir` parameters must be a string and all the `*Mode` parameters must be a bool.
+
 #### Static parameters
 
 Static parameters do not change at all or have just a few variations. New container is generated every time parameter is

@@ -2,12 +2,18 @@
 
 namespace Tests\OriNette\DI\Unit\Boot;
 
+use Generator;
 use Nette\DI\Compiler;
+use Nette\DI\CompilerExtension;
+use Nette\DI\Config\Adapter;
 use Nette\DI\Container;
 use Nette\DI\MissingServiceException;
 use OriNette\DI\Boot\ManualConfigurator;
+use Orisai\Exceptions\Logic\InvalidArgument;
+use Orisai\Exceptions\Logic\InvalidState;
 use Orisai\Utils\Dependencies\DependenciesTester;
 use Orisai\Utils\Dependencies\Exception\PackageRequired;
+use Orisai\VFS\VFS;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Tests\OriNette\DI\Doubles\ParametersAddingExtension;
@@ -16,6 +22,7 @@ use Tests\OriNette\DI\Doubles\TestService;
 use Tracy\Debugger;
 use function class_exists;
 use function dirname;
+use function file_put_contents;
 use function is_subclass_of;
 use function mkdir;
 use const PHP_SAPI;
@@ -303,6 +310,371 @@ final class BaseConfiguratorTest extends TestCase
 		self::assertSame('static', $parameters['p1']);
 		self::assertSame('compiler', $parameters['p2']);
 		self::assertSame('file', $parameters['p3']);
+	}
+
+	public function testConfigOverridesDefaultParameter(): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters(['__unique' => __METHOD__]);
+		$configurator->addConfig(__DIR__ . '/config/default-parameters.neon');
+
+		$parameters = $configurator->createContainer()->getParameters();
+
+		self::assertSame("$this->rootDir/www", $parameters['wwwDir']);
+	}
+
+	public function testStaticParameterWithDefaultValueWinsOverConfig(): void
+	{
+		$default = new ManualConfigurator($this->rootDir);
+		$default->setForceReloadContainer();
+		$default->addStaticParameters(['__unique' => __METHOD__]);
+		$default->addConfig(__DIR__ . '/config/default-parameters.neon');
+
+		$explicit = new ManualConfigurator($this->rootDir);
+		$explicit->setForceReloadContainer();
+		$explicit->addStaticParameters(['__unique' => __METHOD__]);
+		$explicit->addStaticParameters(['wwwDir' => "$this->rootDir/public"]);
+		$explicit->addConfig(__DIR__ . '/config/default-parameters.neon');
+
+		self::assertSame("$this->rootDir/www", $default->createContainer()->getParameters()['wwwDir']);
+		self::assertSame("$this->rootDir/public", $explicit->createContainer()->getParameters()['wwwDir']);
+	}
+
+	public function testConfigOverridesBaseUrl(): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters(['__unique' => __METHOD__]);
+		$configurator->addConfig(__DIR__ . '/config/baseUrl.neon');
+		$configurator->addConfig(__DIR__ . '/config/baseUrl-parameter.neon');
+
+		$parameters = $configurator->createContainer()->getParameters();
+
+		self::assertSame('https://cli.example.com', $parameters['baseUrl']);
+	}
+
+	/**
+	 * @dataProvider provideConfiguratorParameter
+	 */
+	public function testConfigCannotOverrideConfiguratorParameter(string $parameter): void
+	{
+		$file = VFS::register() . '://c.neon';
+		file_put_contents($file, "parameters:\n\t$parameter: config");
+
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters(['__unique' => __METHOD__ . $parameter]);
+		$configurator->addConfig($file);
+
+		$this->expectException(InvalidState::class);
+		$this->expectExceptionMessage(
+			<<<MSG
+Context: Loading config file '$file'.
+Problem: Parameter '$parameter' can be changed only via configurator.
+Solution: Remove the parameter from config.
+MSG,
+		);
+
+		$configurator->createContainer();
+	}
+
+	/**
+	 * @return Generator<array<mixed>>
+	 */
+	public function provideConfiguratorParameter(): Generator
+	{
+		yield ['rootDir'];
+		yield ['buildDir'];
+		yield ['logDir'];
+		yield ['debugMode'];
+		yield ['productionMode'];
+		yield ['consoleMode'];
+	}
+
+	public function testConfigCannotOverrideConfiguratorParameterInInclude(): void
+	{
+		$dir = VFS::register() . '://dir';
+		mkdir($dir);
+		file_put_contents("$dir/c.neon", "includes:\n\t- i.neon");
+		file_put_contents("$dir/i.neon", "parameters:\n\tdebugMode: true");
+
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters(['__unique' => __METHOD__]);
+		$configurator->addConfig("$dir/c.neon");
+
+		$this->expectException(InvalidState::class);
+		$this->expectExceptionMessage(
+			<<<MSG
+Context: Loading config file '$dir/i.neon'.
+Problem: Parameter 'debugMode' can be changed only via configurator.
+Solution: Remove the parameter from config.
+MSG,
+		);
+
+		$configurator->createContainer();
+	}
+
+	/**
+	 * @param array<int, string> $configFiles
+	 *
+	 * @dataProvider provideParameterUsedInIncludes
+	 */
+	public function testConfigCannotOverrideParameterUsedInIncludes(array $configFiles): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters(['__unique' => __METHOD__]);
+		foreach ($configFiles as $configFile) {
+			$configurator->addConfig($configFile);
+		}
+
+		$this->expectException(InvalidState::class);
+		$this->expectExceptionMessage("Problem: Parameter 'appDir' is changed by config and used by includes.");
+
+		$configurator->createContainer();
+	}
+
+	/**
+	 * @return Generator<array<mixed>>
+	 */
+	public function provideParameterUsedInIncludes(): Generator
+	{
+		yield [
+			[
+				__DIR__ . '/config/appDir-parameter.neon',
+				__DIR__ . '/config/appDir-include.neon',
+			],
+		];
+
+		yield [
+			[
+				__DIR__ . '/config/appDir-include.neon',
+				__DIR__ . '/config/appDir-parameter.neon',
+			],
+		];
+	}
+
+	public function testStaticParameterUsedInIncludesIsNotOverriddenByConfig(): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters(['__unique' => __METHOD__]);
+		$configurator->addStaticParameters(['appDir' => "$this->rootDir/src"]);
+		$configurator->addConfig(__DIR__ . '/config/appDir-parameter.neon');
+		$configurator->addConfig(__DIR__ . '/config/appDir-include.neon');
+
+		$parameters = $configurator->createContainer()->getParameters();
+
+		self::assertSame("$this->rootDir/src", $parameters['appDir']);
+		self::assertSame("$this->rootDir/www", $parameters['wwwDir']);
+	}
+
+	public function testConfigIsLoadedOnce(): void
+	{
+		$adapter = new class implements Adapter {
+
+			public int $loads = 0;
+
+			public function load(string $file): array
+			{
+				$this->loads++;
+
+				return [];
+			}
+
+		};
+
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters(['__unique' => __METHOD__]);
+		$configurator->addConfigAdapter('counted', $adapter);
+		$configurator->addConfig(__DIR__ . '/config/loaded-once.counted');
+
+		$configurator->createContainer();
+
+		self::assertSame(1, $adapter->loads);
+	}
+
+	/**
+	 * @param mixed $value
+	 *
+	 * @dataProvider provideRejectedStaticParameter
+	 */
+	public function testStaticParameterIsRejected(string $parameter, $value, string $problem): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+
+		$this->expectException(InvalidArgument::class);
+		$this->expectExceptionMessage("Problem: $problem");
+
+		$configurator->addStaticParameters([$parameter => $value]);
+	}
+
+	/**
+	 * @return Generator<array<mixed>>
+	 */
+	public function provideRejectedStaticParameter(): Generator
+	{
+		yield ['debugMode', true, "Parameter 'debugMode' can be changed only via setDebugMode()."];
+		yield ['productionMode', false, "Parameter 'productionMode' can be changed only via setDebugMode()."];
+		yield ['rootDir', '/root', "Parameter 'rootDir' can be changed only via constructor."];
+		yield ['appDir', 1, "Parameter 'appDir' must be string, int given."];
+		yield ['buildDir', null, "Parameter 'buildDir' must be string, null given."];
+		yield ['dataDir', 1, "Parameter 'dataDir' must be string, int given."];
+		yield ['logDir', 1, "Parameter 'logDir' must be string, int given."];
+		yield ['tempDir', 1, "Parameter 'tempDir' must be string, int given."];
+		yield ['vendorDir', 1, "Parameter 'vendorDir' must be string, int given."];
+		yield ['wwwDir', 1, "Parameter 'wwwDir' must be string, int given."];
+		yield ['consoleMode', 'yes', "Parameter 'consoleMode' must be bool, string given."];
+	}
+
+	/**
+	 * @dataProvider provideOverridableDirParameter
+	 */
+	public function testDynamicParameterTypeIsValidated(string $parameter): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+
+		$this->expectException(InvalidArgument::class);
+		$this->expectExceptionMessage("Problem: Parameter '$parameter' must be string, int given.");
+
+		$configurator->addDynamicParameters([$parameter => 1]);
+	}
+
+	/**
+	 * @dataProvider provideOverridableDirParameter
+	 */
+	public function testConfigParameterTypeIsValidated(string $parameter): void
+	{
+		$file = VFS::register() . '://c.neon';
+		file_put_contents($file, "parameters:\n\tnumber: 1\n\t$parameter: %number%");
+
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters(['__unique' => __METHOD__ . $parameter]);
+		$configurator->addConfig($file);
+
+		$this->expectException(InvalidState::class);
+		$this->expectExceptionMessage("Problem: Parameter '$parameter' must be string, int given.");
+
+		$configurator->createContainer();
+	}
+
+	/**
+	 * @return Generator<array<mixed>>
+	 */
+	public function provideOverridableDirParameter(): Generator
+	{
+		yield ['appDir'];
+		yield ['dataDir'];
+		yield ['tempDir'];
+		yield ['vendorDir'];
+		yield ['wwwDir'];
+	}
+
+	/**
+	 * @param mixed $value
+	 *
+	 * @dataProvider provideChangedConfiguratorParameter
+	 */
+	public function testOnCompileCannotChangeConfiguratorParameter(string $parameter, $value): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters(['__unique' => __METHOD__ . $parameter]);
+		$configurator->onCompile[] = static function (Compiler $compiler) use ($parameter, $value): void {
+			$compiler->addConfig(['parameters' => [$parameter => $value]]);
+		};
+
+		$this->expectException(InvalidState::class);
+		$this->expectExceptionMessage("Problem: Configurator parameter '$parameter' was changed during compilation.");
+
+		$configurator->createContainer();
+	}
+
+	/**
+	 * @return Generator<array<mixed>>
+	 */
+	public function provideChangedConfiguratorParameter(): Generator
+	{
+		yield ['rootDir', '/changed'];
+		yield ['buildDir', '/changed'];
+		yield ['logDir', '/changed'];
+		yield ['debugMode', true];
+		yield ['productionMode', false];
+		yield ['consoleMode', PHP_SAPI !== 'cli'];
+	}
+
+	public function testExtensionCannotChangeConfiguratorParameter(): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters(['__unique' => __METHOD__]);
+		$configurator->onCompile[] = static function (Compiler $compiler): void {
+			$compiler->addExtension('changing', new class extends CompilerExtension {
+
+				public function beforeCompile(): void
+				{
+					$this->getContainerBuilder()->parameters['debugMode'] = true;
+				}
+
+			});
+		};
+
+		$this->expectException(InvalidState::class);
+		$this->expectExceptionMessage("Problem: Configurator parameter 'debugMode' was changed during compilation.");
+
+		$configurator->createContainer();
+	}
+
+	public function testConfiguratorParameterWithEscapedCharacters(): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters(['__unique' => __METHOD__]);
+		$configurator->addStaticParameters(['logDir' => '@log/100%']);
+
+		$parameters = $configurator->createContainer()->getParameters();
+
+		self::assertSame('@@log/100%', $parameters['logDir']);
+	}
+
+	public function testCustomConfigAdapterIsGuarded(): void
+	{
+		$adapter = new class implements Adapter {
+
+			public function load(string $file): array
+			{
+				return ['parameters' => ['debugMode' => true]];
+			}
+
+		};
+
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addStaticParameters(['__unique' => __METHOD__]);
+		$configurator->addConfigAdapter('counted', $adapter);
+		$configurator->addConfig(__DIR__ . '/config/loaded-once.counted');
+
+		$this->expectException(InvalidState::class);
+		$this->expectExceptionMessage("Problem: Parameter 'debugMode' can be changed only via configurator.");
+
+		$configurator->createContainer();
+	}
+
+	/**
+	 * @dataProvider provideConfiguratorParameter
+	 */
+	public function testDynamicParameterIsRejected(string $parameter): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+
+		$this->expectException(InvalidArgument::class);
+		$this->expectExceptionMessage("Problem: Configurator parameter '$parameter' cannot be dynamic.");
+
+		$configurator->addDynamicParameters([$parameter => 'dynamic']);
 	}
 
 	public function testInitialize(): void

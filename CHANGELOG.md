@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/orisai/nette-di/compare/1.5.0...v1.x)
 
+### Changed
+
+- `BaseConfigurator`
+	- default parameters not changed by `addStaticParameters()` can be overridden by config files (matches
+	  nette/bootstrap behavior)
+	- config file, dynamic parameter, `onCompile` callback or extension changing parameter used by configurator
+	  (`%rootDir%`, `%buildDir%`, `%logDir%`, `%debugMode%`, `%productionMode%`, `%consoleMode%`) throws an exception
+	- config file changing default parameter used in `includes` section throws an exception
+	- `addStaticParameters()` throws an exception for `%debugMode%` and `%productionMode%` (use `setDebugMode()`) and
+	  `%rootDir%` (use constructor)
+	- `*Dir` parameters must be a string and `*Mode` parameters must be a bool
+
 ### Fixed
 
 - Docs - `%tempDir%` default value is `%rootDir%/var/cache`
